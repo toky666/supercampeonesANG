@@ -1,3 +1,21 @@
 <page-header />
+<!-- modal de guardar -->
+<!-- Botón que abre el diálogo -->
+<button mat-button (click)="openDialog()">Abrir diálogo</button>
 
-<p>roles works!</p>
+<ng-template #dialogTemplate>
+  <h1 mat-dialog-title>Diálogo en Angular 21</h1>
+  <div mat-dialog-content>
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline">
+        <mat-label>Outline form field</mat-label>
+        <input matInput placeholder="Placeholder" formControlName="name" />
+        <mat-hint>Hint</mat-hint>
+      </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Cerrar</button>
+    <button mat-button [mat-dialog-close]="true" (click)="saveData()">Aceptar</button>
+  </div>
+</ng-template>
