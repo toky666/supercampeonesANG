@@ -11,6 +11,20 @@
       }
     },
     {
+      "route": "sistema",
+      "name": "sistema",
+      "type": "sub",
+      "icon": "business_center",
+      "children": [
+        {
+          "route": "roles",
+          "name": "roles",
+          "type": "link",
+          "icon": "radio_button_checked"
+        }
+      ]
+    },
+    {
       "route": "/",
       "name": "sessions",
       "type": "sub",

@@ -21,6 +21,7 @@ export const routes: Routes = [
       { path: '403', component: Error403 },
       { path: '404', component: Error404 },
       { path: '500', component: Error500 },
+      { path: 'sistema', loadChildren: () => import('./routes/sistema/sistema.routes').then(m => m.routes) },
     ],
   },
   {
