@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
 
 @Injectable({
@@ -24,7 +24,39 @@ export class RolesServicesService {
     return headers;
   }
 
+  private rolesSubject = new BehaviorSubject<rolesInterfaz[]>([]);
+  roles$ = this.rolesSubject.asObservable();
+
+  private totalSubject = new BehaviorSubject<number>(0);
+  total$ = this.totalSubject.asObservable();
+
   save(guardar: rolesInterfaz) {
+    return this.http
+      .post<rolesInterfaz>(
+        this.API_ENDPOINT + '/roles',
+        { data: guardar },
+        { headers: this._header() },
+      )
+      .pipe(
+        tap((nuevo) => {
+          const current = this.rolesSubject.value;
+          this.rolesSubject.next([...current, nuevo]);
+        }),
+      );
+  }
+
+  dataTablePagination(query: any): Observable<any> {
+    return this.http
+      .post(this.API_ENDPOINT + '/roles/datatable', query, { headers: this._header() })
+      .pipe(
+        tap((resp: any) => {
+          this.rolesSubject.next(resp.data); // llena el BehaviorSubject
+          this.totalSubject.next(resp.count); // opcional: total de registros
+        }),
+      );
+  }
+
+  save2222(guardar: rolesInterfaz) {
     return this.http.post(
       this.API_ENDPOINT + '/roles',
       { data: guardar },
@@ -54,7 +86,7 @@ export class RolesServicesService {
     }) as Observable<any>;
   }
 
-  dataTablePagination(query: any): Observable<any> {
+  dataTablePagination222222(query: any): Observable<any> {
     return this.http.post(this.API_ENDPOINT + '/roles/datatable', query, {
       headers: this._header(),
     });
@@ -82,10 +114,23 @@ export class RolesServicesService {
       );
   }*/
 
-  remove(id: any): Observable<any> {
+  remove22222(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
       headers: this._header(),
     });
+  }
+  remove(id: any): Observable<any> {
+    return this.http
+      .delete(this.API_ENDPOINT + '/roles/' + id, {
+        headers: this._header(),
+      })
+      .pipe(
+        tap(() => console.log(`Rol ${id} eliminado`)), // logging automático
+        catchError((err) => {
+          console.error('Error eliminando rol:', err);
+          return throwError(() => err); // manejo centralizado de errores
+        }),
+      );
   }
 
   searchRoles(search: string): Observable<any> {

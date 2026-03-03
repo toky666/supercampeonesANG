@@ -1,9 +1,7 @@
 <page-header />
-<!-- modal de guardar -->
-<!-- Botón que abre el diálogo -->
+<!-- 
 <button mat-button (click)="openDialog()">Abrir diálogo</button>
-
-<ng-template #dialogTemplate>
+<ng-template #dialogAdd>
   <h1 mat-dialog-title>Diálogo en Angular 21</h1>
   <div mat-dialog-content>
     <form [formGroup]="form">
@@ -44,52 +42,287 @@
       >
         <mat-icon class="icon10"> edit </mat-icon>
       </button>
+
       <button
         mat-icon-button
         matTooltip="eliminar"
         matTooltipPosition="below"
+        (click)="openDelete()"
       >
         <mat-icon color="warn" class="mat-18 mat-color-primary"> delete </mat-icon>
       </button>
+          <ng-template #dialogDelete>
+            <div class="barraRoja"></div>
+            <div class="modal-body text-center">
+              <div class="partePrincipalEliminar">
+                <div class="textoEliminar">
+                  <div>
+                    <h4>
+                      <b
+                        ><p>confirmar</p></b
+                      >
+                    </h4>
+                  </div>
+                  <div>
+                    <td id="delete-confirmation">{{ data.name }}</td>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" (click)="confirm(data._id)">
+                  <div class="alinearIconsButton">
+                    <span class="material-icons"> check_circle </span
+                    >si
+                  </div>
+                </button>
+                <button type="button" class="btn btn-danger">
+                  <div class="alinearIconsButton">
+                    <span class="material-icons">
+                      cancel
+                    </span>
+                    no
+                  </div>
+                </button>
+              </div>
+            </div>
+          </ng-template>
     </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let data; columns: displayedColumns"></tr>
-</table>
+</table> -->
 
-<!--
-<table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)"
-       class="mat-elevation-z8">
+<!-- modal de guardar -->
+<ng-template #dialogAdd>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left" class="titulo">
+      <div class="alinearIconsTitle">
+        <span class="material-icons"> bookmark </span>
+        <iconify-icon icon="icon-park-solid:system" width="50" height="50" />
+      </div>
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closedModalSave()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" (ngSubmit)="f.form.valid && saveData()" #f="ngForm" novalidate>
+      <mat-form-field class="example-full-width" appearance="outline">
+        <mat-label for="name">Name</mat-label>
 
-  <ng-container matColumnDef="position">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by number">
-      No.
-    </th>
-    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-  </ng-container>
+        <input
+          matInput
+          formControlName="name"
+          name="name"
+          [(ngModel)]="dataSave.name"
+          autocomplete="off"
+        />
+        @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+          <mat-error>Name is <strong>required</strong></mat-error>
+        }
+        @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+          <mat-error>Minimum 3 characters required</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-success"
+      type="submit"
+      [disabled]="form.invalid"
+      (click)="saveData()"
+      mat-dialog-close
+    >
+      <div class="alinearIconsButton">
+        <span class="material-icons"> cloud </span>
+        guardar
+      </div>
+    </button>
+    <button type="button" class="btn btn-danger" (click)="closedModalSave()">
+      <div class="alinearIconsButton"><span class="material-icons"> cancel </span>cerrar</div>
+    </button>
+  </div>
+</ng-template>
+<!-- fin modal guardar -->
 
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
-      Name
-    </th>
-    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-  </ng-container>
+<div class="presentacionPrincipal">
+  <div class="definicionPrincipal">
+    <div class="definicionUsers">
+      <div class="presentacionLetras">
+        <p>parrafo</p>
+      </div>
+    </div>
+  </div>
 
-  <ng-container matColumnDef="weight">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by weight">
-      Weight
-    </th>
-    <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
-  </ng-container>
+  <div class="vistaUsers">
+    <div class="barraAzul"></div>
+    <div class="vista1">
+      {{ this.total }}
+    </div>
+    <div class="vista2">tabla</div>
 
-  <ng-container matColumnDef="symbol">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by symbol">
-      Symbol
-    </th>
-    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
-  </ng-container>
+    <div class="vista3">
+      <button mat-flat-button class="btnAdicionar" (click)="openModalSave()">
+        <div class="alinearIconsButton">
+          <span class="material-icons">add_circle </span>
+          adccionar roles
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>-->
+<div class="example-container mat-elevation-z8">
+  <div class="uni">
+    <mat-form-field class="example-full-width1" appearance="outline">
+      <mat-label for="obs">buscar</mat-label>
+      <input matInput type="text" (keyup)="doFilter($event.target.value)" autocomplete="off" />
+      <button matSuffix mat-icon-button aria-label="Clear" (click)="resetFilter()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div id="panel-table">
+    <div class="tituloTabla">titulo</div>
+  </div>
+  <div class="table-container">
+    <table
+      mat-table
+      fxFlex
+      class="mat-elevation-z1 min-w-600"
+      [dataSource]="dataSource"
+      matSort
+      (matSortChange)="sortData($event)"
+    >
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="name" class="tableHeader">nombre</th>
+        <td mat-cell *matCellDef="let producto">{{ producto.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef class="tableHeader">acciones</th>
+        <td mat-cell *matCellDef="let producto">
+          <button
+            mat-icon-button
+            matTooltip="edit"
+            matTooltipPosition="below"
+            matTooltipClass="example-tooltip-red"
+            (click)="openModalUpdate(producto._id, producto.name)"
+          >
+            <mat-icon class="icon10"> edit </mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="eliminar"
+            matTooltipPosition="below"
+            (click)="openModalDelete(producto._id, producto.name)"
+          >
+            <mat-icon color="warn" class="mat-18 mat-color-primary"> delete </mat-icon>
+          </button>
+          <!-- modal de eliminar -->
+          <ng-template #dialogDelete>
+            <div class="barraRoja"></div>
+            <div class="modal-body text-center">
+              <div class="partePrincipalEliminar">
+                <div class="textoEliminar">
+                  <div>
+                    <h4>
+                      <b><p>confirmar</p></b>
+                    </h4>
+                  </div>
+                  <div>
+                    <td id="delete-confirmation">{{ nameDelete }}</td>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" (click)="deleteData()" mat-dialog-close>
+                  <div class="alinearIconsButton">
+                    <span class="material-icons"> check_circle </span>si
+                  </div>
+                </button>
+                <button type="button" class="btn btn-danger" (click)="closedModalDelete()" mat-dialog-close>
+                  <div class="alinearIconsButton">
+                    <span class="material-icons"> cancel </span>
+                    no
+                  </div>
+                </button>
+              </div>
+            </div>
+          </ng-template>
+          <!-- modal de eliminar -->
+          <!-- modal de editar -->
+          <ng-template #dialogUpdate>
+            <div class="modal-header">
+              <h4 class="modal-title pull-left" class="titulo">
+                <div class="alinearIconsTitle">
+                  <span class="material-icons"> bookmark </span>modificar
+                </div>
+              </h4>
+              <button
+                type="button"
+                class="close pull-right"
+                aria-label="Close"
+                (click)="closedModalUpdate()"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form
+                [formGroup]="form"
+                (ngSubmit)="f.form.valid && updateListData()"
+                #f="ngForm"
+                novalidate
+              >
+                <mat-form-field class="example-full-width" appearance="outline">
+                  <mat-label for="name">nombre</mat-label>
+                  <input
+                    matInput
+                    formControlName="name"
+                    name="name"
+                    [(ngModel)]="dataSave.name"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" (click)="updateListData()">
+                <div class="alinearIconsButton">
+                  <span class="material-icons"> edit </span>modificar
+                </div>
+              </button>
+              <button type="button" class="btn btn-danger" (click)="closedModalUpdate()">
+                <div class="alinearIconsButton">
+                  <span class="material-icons"> cancel </span>
+                  cerrar
+                </div>
+              </button>
+            </div>
+          </ng-template>
+          <!-- fin modal editar -->
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let producto; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>
+
+@if (element) {
+  <mat-paginator
+    [length]="total"
+    [pageSize]="limit"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="pageChanged($event)"
+  />
+} @else {
+  <p>El paginador está oculto</p>
+}

@@ -7,6 +7,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewEncapsulation,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { PageHeader } from '@shared';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,13 +17,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 
-import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
 import { RolesServicesService } from '../../services/roles-services.service';
 import { rolesInterfaz } from '../../Interfaces/rolesInterfaz';
-
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
 
@@ -38,15 +45,22 @@ declare let alertify: any;
     ReactiveFormsModule,
     MatTableModule,
     MatSortModule,
+    FormsModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './roles.html',
   standalone: true,
   styleUrl: './roles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // habilita <iconify-icon>
 })
 export class SistemaRoles implements OnInit {
   private _liveAnnouncer = inject(LiveAnnouncer);
-
+  value = '';
+  element = true;
   displayedColumns: string[] = ['nombre', 'action'];
   dataSource: any;
   public page = 1;
@@ -58,51 +72,98 @@ export class SistemaRoles implements OnInit {
   offset = 0;
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
-  @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
-  @ViewChild(MatSort) sort!: MatSort;
+  dataSave: rolesInterfaz = {
+    name: '',
+  };
+  @ViewChild('dialogAdd') dialogAdd!: TemplateRef<any>;
+  @ViewChild('dialogDelete') dialogDelete!: TemplateRef<any>;
+  @ViewChild('dialogUpdate') dialogUpdate!: TemplateRef<any>;
+
+  @ViewChild(MatSort) myMatSort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private dialog = inject(MatDialog);
   private dataService = inject(RolesServicesService);
   ngOnInit(): void {
-    this.initTable();
-    this.dataSource.sort = this.sort;
-    this.initTable();
+    //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
+    this.dataSource = new MatTableDataSource<any>();
+    // Consulta inicial al backend al entrar o recargar
+    this.dataService
+      .dataTablePagination({ limit: 10, offset: 0, query: {}, sort: { _id: -1 } })
+      .subscribe(); // Suscripción reactiva a los datos
+
+    this.dataService.roles$.subscribe((data) => {
+      this.dataSource.data = data;
+    }); // Opcional: suscribirse al total de registros
+    this.dataService.total$.subscribe((total) => {
+      this.total = total;
+    });
   }
 
-
   form = new FormGroup({
-    name: new FormControl<string>(''), // ahora es siempre string
+    name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
   });
 
   openDialog() {
-    this.dialog.open(this.dialogTemplate, { width: '400px' });
+    this.dialog.open(this.dialogAdd, { width: '400px' });
   }
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+
+  onResetForm() {
+    this.form.reset();
+  }
+  decline(): void {
+    this.dialog.closeAll();
+  }
+  doFilter(filterValue: string) {
+    if (filterValue.length > 0) {
+      this.filter = filterValue;
+      if (this.sortBandera == 1) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: filterValue },
+          sort: { name: 1 },
+        };
+      }
+
+      if (this.sortBandera == 2) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: filterValue },
+          sort: { name: -1 },
+        };
+      }
+
+      if (this.sortBandera == 3) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: filterValue },
+          sort: { _id: -1 },
+        };
+      }
+
+      this.changeTable(this.query);
+      this.hideData();
     } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+      this.resetFilter();
     }
   }
-  saveData() {
-    if (this.form.valid) {
-      this.dataService.save(this.form.value as rolesInterfaz).subscribe(
-        (data) => {
-          console.log('Se agrego el rol a la lista');
-        },
-        (error) => {
-          console.log(error);
-          console.log('Se desconecto el servidor de la lista');
-        },
-      );
-    } else {
-      console.log('Llene todos los campos');
-    }
+
+  hideData() {
+    return (this.element = false);
+  }
+
+  getData(ide1: any) {
+    this.dataService.findOne(ide1).subscribe(
+      (data) => {
+        this.dataUpdate.name = data.name;
+      },
+      (err) => {
+        console.log(err);
+      },
+    );
   }
 
   initTable() {
@@ -149,20 +210,6 @@ export class SistemaRoles implements OnInit {
       }
     });
     this.changeTable(this.query);
-  }
-
-  changeTable(query: any) {
-    this.dataService.dataTablePagination(query).subscribe(
-      (data) => {
-        this.dataSource = new MatTableDataSource();
-        this.dataSource.data = data.data;
-        this.total = data.count;
-        console.log(this.dataSource.data);
-      },
-      (err) => {
-        console.log('error ws: ');
-      },
-    );
   }
 
   formatAsISO(d: any) {
@@ -251,6 +298,131 @@ export class SistemaRoles implements OnInit {
       //this.changeFilter();
       this.changeTable(this.query);
       return;
+    }
+  }
+
+  /*************************************************************************************************/
+  saveData() {
+    if (this.form.valid) {
+      this.dataService.save(this.form.value as rolesInterfaz).subscribe({
+        next: (data: rolesInterfaz) => {
+          // Inserta el nuevo registro directamente en el dataSource
+          this.ActuallyTable();
+          //this.dataSource.data = [...this.dataSource.data, data];
+          //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
+          this.paginator.firstPage(); // mueve el paginador a la última página
+
+          // Mantén la página actual en el paginator
+          // this.paginator._changePageSize(this.paginator.pageSize);
+
+          // Limpia el formulario
+          this.form.reset();
+          this.resetFilter();
+        },
+        error: (err) => {
+          console.error('Error al guardar', err);
+        },
+      });
+    }
+  }
+  resetFilter() {
+    this.value = '';
+    this.filter = '';
+    this.offset = 0;
+    this.page = 1;
+    this.limit = 5;
+    this.sortBandera = 3;
+    this.pageSizeOptions = [5, 10, 25, 100];
+    this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+    this.myMatSort.sort({ id: '', start: 'asc', disableClear: false });
+    this.changeTable(this.query);
+    this.showData();
+  }
+  changeTable(query: any) {
+    this.dataService.dataTablePagination(query).subscribe(
+      (data) => {
+        this.dataSource = new MatTableDataSource();
+        this.dataSource.data = data.data;
+        this.total = data.count;
+        console.log(this.dataSource.data);
+      },
+      (err) => {
+        console.log('error ws: ');
+      },
+    );
+  }
+  showData() {
+    return (this.element = true);
+  }
+
+  openModalSave() {
+    this.dialog.open(this.dialogAdd, { width: '900px', height: '400px', disableClose: true });
+  }
+
+  closedModalSave() {
+    this.form.reset();
+    this.dialog.closeAll();
+  }
+  ActuallyTable() {
+    // Primera carga rápida
+    this.dataService.dataTablePagination(this.query).subscribe();
+
+    // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
+    this.dataService.roles$.subscribe((data) => {
+      this.dataSource.data = data;
+    });
+  }
+  dataDelete: any;
+  nameDelete: any;
+  openModalDelete(ide: any, name: any) {
+    console.log('ID a eliminar:', ide);
+    this.dataDelete = ide;
+    this.nameDelete = name; // Guarda el ID en una propiedad de la clase
+    this.dialog.open(this.dialogDelete, { width: '400px', height: '400px', disableClose: true });
+  }
+  closedModalDelete() {
+    this.form.reset();
+    this.dialog.closeAll();
+  }
+  deleteData(): void {
+    this.dataService.remove(this.dataDelete).subscribe({
+      next: () => {
+        console.log('Se eliminó correctamente');
+        this.ActuallyTable(); // 👈 método único para refrescar
+      },
+      error: (err) => {
+        console.error('Error al eliminar:', err);
+      },
+    });
+  }
+  closedModalUpdate() {
+    this.form.reset();
+    this.dialog.closeAll();
+  }
+
+  dataUpdate: any;
+  nameUpdate: any;
+  openModalUpdate(ide: any, name: any) {
+    console.log('ID a actualizar:', ide);
+    this.dataUpdate = ide;
+    this.dataSave.name = name; // Guarda el nombre en una propiedad de la clase
+    this.dialog.open(this.dialogUpdate, { width: '400px' });
+  }
+  updateListData() {
+    if (this.form.valid) {
+      this.dataService.update(this.dataUpdate, this.dataSave).subscribe({
+        next: () => {
+          this.initTable();
+          this.closedModalUpdate();
+          this.resetFilter();
+          this.paginator.firstPage();
+        },
+        error: (err) => {
+          console.error(err);
+        },
+      });
+    } else {
+      console.error(' Formulario no válido');
     }
   }
 }
