@@ -130,12 +130,10 @@
   </div>
   <div class="modal-footer">
     <button
-      type="button"
       class="btn btn-success"
       type="submit"
       [disabled]="form.invalid"
       (click)="saveData()"
-      mat-dialog-close
     >
       <div class="alinearIconsButton">
         <span class="material-icons"> cloud </span>
@@ -180,10 +178,18 @@
   <div class="uni">
     <mat-form-field class="example-full-width1" appearance="outline">
       <mat-label for="obs">buscar</mat-label>
-      <input matInput type="text" (keyup)="doFilter($event.target.value)" autocomplete="off" />
-      <button matSuffix mat-icon-button aria-label="Clear" (click)="resetFilter()">
-        <mat-icon>close</mat-icon>
-      </button>
+      <input
+        matInput
+        [formControl]="searchControl"
+        type="text"
+        (keyup)="doFilter($event.target.value)"
+        autocomplete="off"
+      />
+      @if ((searchControl.value ?? '') !== '') {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="searchControl.setValue('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
     </mat-form-field>
   </div>
   <div id="panel-table">
@@ -196,7 +202,7 @@
       class="mat-elevation-z1 min-w-600"
       [dataSource]="dataSource"
       matSort
-      (matSortChange)="sortData($event)"
+      (matSortChange)="onSortChange()"
     >
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="name" class="tableHeader">nombre</th>
@@ -241,12 +247,22 @@
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-success" (click)="deleteData()" mat-dialog-close>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  (click)="deleteData()"
+                  mat-dialog-close
+                >
                   <div class="alinearIconsButton">
                     <span class="material-icons"> check_circle </span>si
                   </div>
                 </button>
-                <button type="button" class="btn btn-danger" (click)="closedModalDelete()" mat-dialog-close>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  (click)="closedModalDelete()"
+                  mat-dialog-close
+                >
                   <div class="alinearIconsButton">
                     <span class="material-icons"> cancel </span>
                     no
@@ -276,7 +292,7 @@
             <div class="modal-body">
               <form
                 [formGroup]="form"
-                (ngSubmit)="f.form.valid && updateListData()"
+                (ngSubmit)="f.form.valid && updateData()"
                 #f="ngForm"
                 novalidate
               >
@@ -289,11 +305,17 @@
                     [(ngModel)]="dataSave.name"
                     autocomplete="off"
                   />
+                  @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                    <mat-error>Name is <strong>required</strong></mat-error>
+                  }
+                  @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                    <mat-error>Minimum 3 characters required</mat-error>
+                  }
                 </mat-form-field>
               </form>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-success" (click)="updateListData()">
+              <button type="button" class="btn btn-success" (click)="updateData()">
                 <div class="alinearIconsButton">
                   <span class="material-icons"> edit </span>modificar
                 </div>

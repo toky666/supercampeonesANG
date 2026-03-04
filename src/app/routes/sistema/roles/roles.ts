@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import {
@@ -30,6 +30,7 @@ import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
 
@@ -66,10 +67,13 @@ export class SistemaRoles implements OnInit {
   public page = 1;
   public total = 0;
   public query: any = {};
-  public limit = 10;
+  public limit = 5;
   sortBandera = 3;
   filter: any = '';
   offset = 0;
+
+  // Control para el input de búsqueda
+  searchControl = new FormControl('');
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
   dataSave: rolesInterfaz = {
@@ -78,18 +82,45 @@ export class SistemaRoles implements OnInit {
   @ViewChild('dialogAdd') dialogAdd!: TemplateRef<any>;
   @ViewChild('dialogDelete') dialogDelete!: TemplateRef<any>;
   @ViewChild('dialogUpdate') dialogUpdate!: TemplateRef<any>;
-
+dialogRef!: MatDialogRef<any>;
   @ViewChild(MatSort) myMatSort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  data: any[] = [];
 
+  pageSize = 5;
+  pageIndex = 0;
   private dialog = inject(MatDialog);
   private dataService = inject(RolesServicesService);
   ngOnInit(): void {
+    this.searchControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((value) => {
+        const safeValue = (value ?? '').trim(); // si es null, usa ''
+        if (safeValue) {
+          // hay texto → aplica filtro
+          this.filter = safeValue;
+          // fuerza el pageSize a 1
+          this.loadData(this.filter);
+        } else {
+          this.sortBandera = 3;
+          this.myMatSort.active = 'id'; // ninguna columna activa
+          this.myMatSort.direction = 'desc'; // sin dirección      this.myMatSort.direction = ''; // sin dirección
+          this.pageSize = 5; // valor inicial
+          this.pageIndex = 0; // empieza en la primera página
+          //this.dataSource.data = [...this.dataSource.data, data];
+          //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
+          this.paginator.firstPage(); // mueve el paginador a la última página
+
+          this.filter = '';
+          this.initTable(); // no hay texto → reinicia tabla
+        }
+      });
+
     //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
     this.dataSource = new MatTableDataSource<any>();
     // Consulta inicial al backend al entrar o recargar
     this.dataService
-      .dataTablePagination({ limit: 10, offset: 0, query: {}, sort: { _id: -1 } })
+      .dataTablePagination({ limit: 5, offset: 0, query: {}, sort: { _id: -1 } })
       .subscribe(); // Suscripción reactiva a los datos
 
     this.dataService.roles$.subscribe((data) => {
@@ -103,7 +134,15 @@ export class SistemaRoles implements OnInit {
   form = new FormGroup({
     name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
   });
-
+  resetSort() {
+    if (this.myMatSort) {
+      this.sortBandera = 3;
+      this.myMatSort.active = 'id'; // ninguna columna activa
+      this.myMatSort.direction = 'desc'; // sin dirección      this.myMatSort.direction = ''; // sin dirección
+      this.myMatSort.sortChange.emit(); // notifica a la tabla que se reinició
+      this.paginator.firstPage(); // mueve el paginador a la última página
+    }
+  }
   openDialog() {
     this.dialog.open(this.dialogAdd, { width: '400px' });
   }
@@ -114,7 +153,143 @@ export class SistemaRoles implements OnInit {
   decline(): void {
     this.dialog.closeAll();
   }
+
+  // Método que carga datos desde el backend
+  loadData(filterValue = '') {
+    let sortObj: Record<string, number> = { name: 1 }; // valor por defecto
+    if (this.myMatSort && this.myMatSort.active && this.myMatSort.direction) {
+      sortObj = { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? 1 : -1 };
+    }
+
+    const query = {
+      limit: this.pageSize,
+      offset: this.pageIndex * this.pageSize,
+      query: filterValue ? { name: filterValue } : {},
+      sort: this.myMatSort
+        ? { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? 1 : -1 }
+        : { name: 1 },
+    };
+    this.dataService.doFilter(query).subscribe((res) => {
+      this.data = res.data; // registros de la página
+      console.log(this.data);
+      this.total = res.count; // total
+    });
+    this.dataService.dataTablePagination(query).subscribe();
+
+    // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
+    this.dataService.roles$.subscribe((data) => {
+      this.dataSource.data = data;
+    });
+  } // Este método lo dispara el MatPaginator automáticamente
+  onPageChange(event: any) {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.loadData(this.filter); // usa el filtro actual
+  } // Cuando aplicas un filtro, reinicia a la primera página
   doFilter(filterValue: string) {
+    this.sortBandera = 3;
+    this.limit = 5;
+    this.pageIndex = 0;
+    this.pageSize = 5;
+    this.paginator.firstPage();
+    console.log('Filtro aplicado:', this.pageSize);
+    if (filterValue.length > 0) {
+      this.filter = filterValue;
+      if (this.sortBandera == 1) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { name: 1 },
+        };
+      }
+
+      if (this.sortBandera == 2) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { name: -1 },
+        };
+      }
+
+      if (this.sortBandera == 3) {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { _id: -1 },
+        };
+      }
+      this.dataService.doFilter(this.filter).subscribe((res) => {
+        this.data = res.data; // registros de la página
+        this.data;
+        console.log(this.data);
+        this.total = res.count; // total
+      });
+    } else {
+      this.resetFilter();
+    }
+  }
+  onSortChange() {
+    if (this.filter.length > 0) {
+      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { name: 1 },
+        };
+        this.sortBandera = 1;
+      }
+      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { name: -1 },
+        };
+        this.sortBandera = 2;
+      }
+      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+        this.query = {
+          limit: this.total,
+          offset: (this.page - 1) * this.limit,
+          query: { name: this.filter },
+          sort: { _id: -1 },
+        };
+        this.sortBandera = 3;
+        this.ActuallyTable();
+      }
+
+      //this.changeFilter();
+      this.loadData(this.filter);
+      console.log(this.sortBandera);
+      return;
+    } else {
+      console.log('NO entro');
+      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
+        this.sortBandera = 1;
+      }
+      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
+        this.sortBandera = 2;
+      }
+      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+        this.sortBandera = 3;
+      }
+      //this.changeFilter();
+      this.ActuallyTable(); // recarga datos con el nuevo orden
+      console.log(this.sortBandera);
+      return;
+    }
+
+    // recarga datos con el nuevo orden
+  }
+
+  doFilter00000(filterValue: string) {
     if (filterValue.length > 0) {
       this.filter = filterValue;
       if (this.sortBandera == 1) {
@@ -145,7 +320,7 @@ export class SistemaRoles implements OnInit {
       }
 
       this.changeTable(this.query);
-      this.hideData();
+      this.showData();
     } else {
       this.resetFilter();
     }
@@ -167,7 +342,7 @@ export class SistemaRoles implements OnInit {
   }
 
   initTable() {
-    this.limit = 10;
+    this.limit = 5;
     this.page = 1;
     this.query = {
       limit: this.limit,
@@ -235,17 +410,23 @@ export class SistemaRoles implements OnInit {
     this.offset = event.pageSize * event.pageIndex;
     this.limit = event.pageSize;
     this.page = 1;
-    if (this.sortBandera == 3) {
-      this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+    if (this.filter.length > 0) {
+      this.pageSize = event.pageSize;
+      this.pageIndex = event.pageIndex;
+
+      this.loadData(this.filter); // usa el filtro actual
+    } else {
+      if (this.sortBandera == 3) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+      }
+      if (this.sortBandera == 1) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
+      }
+      if (this.sortBandera == 2) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
+      }
+      this.ActuallyTable();
     }
-    if (this.sortBandera == 1) {
-      this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
-    }
-    if (this.sortBandera == 2) {
-      this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
-    }
-    this.changeFilter();
-    this.changeTable(this.query);
   }
 
   sortData(sort: Sort) {
@@ -305,19 +486,17 @@ export class SistemaRoles implements OnInit {
   saveData() {
     if (this.form.valid) {
       this.dataService.save(this.form.value as rolesInterfaz).subscribe({
-        next: (data: rolesInterfaz) => {
-          // Inserta el nuevo registro directamente en el dataSource
+        next: (data:rolesInterfaz) => {
+         // this.form.reset();
+        // this.dialogRef.close(data); // 🔴 aquí cierras el diálogo
+          //this.dataSave.name = '';
+          
           this.ActuallyTable();
-          //this.dataSource.data = [...this.dataSource.data, data];
-          //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
           this.paginator.firstPage(); // mueve el paginador a la última página
-
-          // Mantén la página actual en el paginator
-          // this.paginator._changePageSize(this.paginator.pageSize);
-
-          // Limpia el formulario
-          this.form.reset();
           this.resetFilter();
+          this.clearSearch();
+          this.dialogRef.close(data); // 🔴 aquí cierras el diálogo
+          this.closedModalSave();
         },
         error: (err) => {
           console.error('Error al guardar', err);
@@ -325,6 +504,11 @@ export class SistemaRoles implements OnInit {
       });
     }
   }
+  clearSearch() {
+    this.searchControl.setValue('');
+    this.doFilter(''); // opcional: refresca la tabla sin filtro
+  }
+
   resetFilter() {
     this.value = '';
     this.filter = '';
@@ -335,8 +519,8 @@ export class SistemaRoles implements OnInit {
     this.pageSizeOptions = [5, 10, 25, 100];
     this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
     this.myMatSort.sort({ id: '', start: 'asc', disableClear: false });
-    this.changeTable(this.query);
-    this.showData();
+    //this.changeTable(this.query);
+    //this.showData();
   }
   changeTable(query: any) {
     this.dataService.dataTablePagination(query).subscribe(
@@ -356,12 +540,12 @@ export class SistemaRoles implements OnInit {
   }
 
   openModalSave() {
-    this.dialog.open(this.dialogAdd, { width: '900px', height: '400px', disableClose: true });
+    this.dialogRef = this.dialog.open(this.dialogAdd, { width: '900px', height: '400px', disableClose: true });
   }
 
   closedModalSave() {
     this.form.reset();
-    this.dialog.closeAll();
+    this.dialogRef.close() ;
   }
   ActuallyTable() {
     // Primera carga rápida
@@ -408,7 +592,7 @@ export class SistemaRoles implements OnInit {
     this.dataSave.name = name; // Guarda el nombre en una propiedad de la clase
     this.dialog.open(this.dialogUpdate, { width: '400px' });
   }
-  updateListData() {
+  updateData() {
     if (this.form.valid) {
       this.dataService.update(this.dataUpdate, this.dataSave).subscribe({
         next: () => {

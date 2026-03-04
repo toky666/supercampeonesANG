@@ -8,7 +8,13 @@ import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
   providedIn: 'root',
 })
 export class RolesServicesService {
+  
   API_ENDPOINT = 'http://localhost:3081/api';
+  private rolesSubject = new BehaviorSubject<rolesInterfaz[]>([]);
+  roles$ = this.rolesSubject.asObservable();
+
+  private totalSubject = new BehaviorSubject<number>(0);
+  total$ = this.totalSubject.asObservable();
 
   private http = inject(HttpClient);
 
@@ -23,12 +29,6 @@ export class RolesServicesService {
     console.log(headers);
     return headers;
   }
-
-  private rolesSubject = new BehaviorSubject<rolesInterfaz[]>([]);
-  roles$ = this.rolesSubject.asObservable();
-
-  private totalSubject = new BehaviorSubject<number>(0);
-  total$ = this.totalSubject.asObservable();
 
   save(guardar: rolesInterfaz) {
     return this.http
@@ -56,12 +56,8 @@ export class RolesServicesService {
       );
   }
 
-  save2222(guardar: rolesInterfaz) {
-    return this.http.post(
-      this.API_ENDPOINT + '/roles',
-      { data: guardar },
-      { headers: this._header() },
-    );
+  doFilter(query: any): Observable<any> {
+    return this.http.post(this.API_ENDPOINT + '/roles/dofilter', query);
   }
 
   update(id: any, edit: any): Observable<any> {
@@ -86,12 +82,6 @@ export class RolesServicesService {
     }) as Observable<any>;
   }
 
-  dataTablePagination222222(query: any): Observable<any> {
-    return this.http.post(this.API_ENDPOINT + '/roles/datatable', query, {
-      headers: this._header(),
-    });
-  }
-
   search(query: any): Observable<any> {
     return this.http.post(this.API_ENDPOINT + '/roles/search', query, {
       headers: this._header(),
@@ -114,11 +104,6 @@ export class RolesServicesService {
       );
   }*/
 
-  remove22222(id: any): Observable<any> {
-    return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
-      headers: this._header(),
-    });
-  }
   remove(id: any): Observable<any> {
     return this.http
       .delete(this.API_ENDPOINT + '/roles/' + id, {
