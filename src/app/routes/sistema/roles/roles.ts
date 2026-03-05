@@ -82,7 +82,7 @@ export class SistemaRoles implements OnInit {
   @ViewChild('dialogAdd') dialogAdd!: TemplateRef<any>;
   @ViewChild('dialogDelete') dialogDelete!: TemplateRef<any>;
   @ViewChild('dialogUpdate') dialogUpdate!: TemplateRef<any>;
-dialogRef!: MatDialogRef<any>;
+  dialogRef!: MatDialogRef<any>;
   @ViewChild(MatSort) myMatSort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   data: any[] = [];
@@ -99,6 +99,10 @@ dialogRef!: MatDialogRef<any>;
         if (safeValue) {
           // hay texto → aplica filtro
           this.filter = safeValue;
+          // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
+          this.dataService.roles$.subscribe((data) => {
+            this.dataSource.data = data;
+          });
           // fuerza el pageSize a 1
           this.loadData(this.filter);
         } else {
@@ -156,9 +160,9 @@ dialogRef!: MatDialogRef<any>;
 
   // Método que carga datos desde el backend
   loadData(filterValue = '') {
-    let sortObj: Record<string, number> = { name: 1 }; // valor por defecto
-    if (this.myMatSort && this.myMatSort.active && this.myMatSort.direction) {
-      sortObj = { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? 1 : -1 };
+    let sortObj: Record<string, number> = { name: 1 };
+    if (this.myMatSort?.active && this.myMatSort.active.trim() !== '' && this.myMatSort.direction) {
+      sortObj = { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? -1 : 1 };
     }
 
     const query = {
@@ -193,6 +197,7 @@ dialogRef!: MatDialogRef<any>;
     this.pageSize = 5;
     this.paginator.firstPage();
     console.log('Filtro aplicado:', this.pageSize);
+
     if (filterValue.length > 0) {
       this.filter = filterValue;
       if (this.sortBandera == 1) {
@@ -320,14 +325,9 @@ dialogRef!: MatDialogRef<any>;
       }
 
       this.changeTable(this.query);
-      this.showData();
     } else {
       this.resetFilter();
     }
-  }
-
-  hideData() {
-    return (this.element = false);
   }
 
   getData(ide1: any) {
@@ -486,17 +486,12 @@ dialogRef!: MatDialogRef<any>;
   saveData() {
     if (this.form.valid) {
       this.dataService.save(this.form.value as rolesInterfaz).subscribe({
-        next: (data:rolesInterfaz) => {
-         // this.form.reset();
-        // this.dialogRef.close(data); // 🔴 aquí cierras el diálogo
-          //this.dataSave.name = '';
-          
+        next: () => {
           this.ActuallyTable();
           this.paginator.firstPage(); // mueve el paginador a la última página
-          this.resetFilter();
-          this.clearSearch();
-          this.dialogRef.close(data); // 🔴 aquí cierras el diálogo
           this.closedModalSave();
+          //this.clearSearch();
+          //this.resetFilter();
         },
         error: (err) => {
           console.error('Error al guardar', err);
@@ -540,12 +535,19 @@ dialogRef!: MatDialogRef<any>;
   }
 
   openModalSave() {
-    this.dialogRef = this.dialog.open(this.dialogAdd, { width: '900px', height: '400px', disableClose: true });
+    this.form.reset();
+    this.clearSearch();
+    this.dialog.open(this.dialogAdd, {
+      width: '900px',
+      height: '400px',
+      disableClose: true,
+    });
   }
 
   closedModalSave() {
+    this.myMatSort.active = 'id'; // ninguna columna activa
     this.form.reset();
-    this.dialogRef.close() ;
+    this.dialog.closeAll();
   }
   ActuallyTable() {
     // Primera carga rápida

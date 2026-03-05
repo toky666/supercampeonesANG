@@ -338,13 +338,10 @@
   </div>
 </div>
 
-@if (element) {
+
   <mat-paginator
     [length]="total"
     [pageSize]="limit"
     [pageSizeOptions]="pageSizeOptions"
     (page)="pageChanged($event)"
   />
-} @else {
-  <p>El paginador está oculto</p>
-}
