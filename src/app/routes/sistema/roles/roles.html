@@ -1,99 +1,4 @@
 <page-header />
-<!-- 
-<button mat-button (click)="openDialog()">Abrir diálogo</button>
-<ng-template #dialogAdd>
-  <h1 mat-dialog-title>Diálogo en Angular 21</h1>
-  <div mat-dialog-content>
-    <form [formGroup]="form">
-      <mat-form-field appearance="outline">
-        <mat-label>Outline form field</mat-label>
-        <input matInput placeholder="Placeholder" formControlName="name" />
-        <mat-hint>Hint</mat-hint>
-      </mat-form-field>
-    </form>
-  </div>
-  <div mat-dialog-actions>
-    <button mat-button mat-dialog-close>Cerrar</button>
-    <button mat-button [mat-dialog-close]="true" (click)="saveData()">Aceptar</button>
-  </div>
-</ng-template>
-
-<table
-  mat-table
-  fxFlex
-  class="mat-elevation-z1 min-w-600"
-  [dataSource]="dataSource"
-  matSort
-  (matSortChange)="sortData($event)"
->
-  <ng-container matColumnDef="nombre">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header="name" class="tableHeader">name</th>
-    <td mat-cell *matCellDef="let data">{{ data.name }}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="action">
-    <th mat-header-cell *matHeaderCellDef class="tableHeader">actions</th>
-    <td mat-cell *matCellDef="let data">
-      <button
-        mat-icon-button
-        matTooltip="editar"
-        matTooltipPosition="below"
-        matTooltipClass="example-tooltip-red"
-      >
-        <mat-icon class="icon10"> edit </mat-icon>
-      </button>
-
-      <button
-        mat-icon-button
-        matTooltip="eliminar"
-        matTooltipPosition="below"
-        (click)="openDelete()"
-      >
-        <mat-icon color="warn" class="mat-18 mat-color-primary"> delete </mat-icon>
-      </button>
-          <ng-template #dialogDelete>
-            <div class="barraRoja"></div>
-            <div class="modal-body text-center">
-              <div class="partePrincipalEliminar">
-                <div class="textoEliminar">
-                  <div>
-                    <h4>
-                      <b
-                        ><p>confirmar</p></b
-                      >
-                    </h4>
-                  </div>
-                  <div>
-                    <td id="delete-confirmation">{{ data.name }}</td>
-                  </div>
-                </div>
-              </div>
-
-              <div class="modal-footer">
-                <button type="button" class="btn btn-success" (click)="confirm(data._id)">
-                  <div class="alinearIconsButton">
-                    <span class="material-icons"> check_circle </span
-                    >si
-                  </div>
-                </button>
-                <button type="button" class="btn btn-danger">
-                  <div class="alinearIconsButton">
-                    <span class="material-icons">
-                      cancel
-                    </span>
-                    no
-                  </div>
-                </button>
-              </div>
-            </div>
-          </ng-template>
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let data; columns: displayedColumns"></tr>
-</table> -->
-
 <!-- modal de guardar -->
 <ng-template #dialogAdd>
   <div class="modal-header">
@@ -103,7 +8,7 @@
         <iconify-icon icon="icon-park-solid:system" width="50" height="50" />
       </div>
     </h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="closedModalSave()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closedModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -140,7 +45,7 @@
         guardar
       </div>
     </button>
-    <button type="button" class="btn btn-danger" (click)="closedModalSave()">
+    <button type="button" class="btn btn-danger" (click)="closedModal()">
       <div class="alinearIconsButton"><span class="material-icons"> cancel </span>cerrar</div>
     </button>
   </div>
@@ -186,7 +91,7 @@
         autocomplete="off"
       />
       @if ((searchControl.value ?? '') !== '') {
-        <button matSuffix mat-icon-button aria-label="Clear" (click)="searchControl.setValue('')">
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
           <mat-icon>close</mat-icon>
         </button>
       }
@@ -260,7 +165,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  (click)="closedModalDelete()"
+                  (click)="closedModal()"
                   mat-dialog-close
                 >
                   <div class="alinearIconsButton">
@@ -284,7 +189,7 @@
                 type="button"
                 class="close pull-right"
                 aria-label="Close"
-                (click)="closedModalUpdate()"
+                (click)="closedModal()"
               >
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -320,7 +225,7 @@
                   <span class="material-icons"> edit </span>modificar
                 </div>
               </button>
-              <button type="button" class="btn btn-danger" (click)="closedModalUpdate()">
+              <button type="button" class="btn btn-danger" (click)="closedModal()">
                 <div class="alinearIconsButton">
                   <span class="material-icons"> cancel </span>
                   cerrar

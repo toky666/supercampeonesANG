@@ -32,7 +32,17 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss", "public/fonts/Material_Icons.css"]
+            "styles": [
+              "src/styles.scss",
+              "public/fonts/Material_Icons.css",
+              "./node_modules/alertifyjs/build/css/alertify.css",
+              "./node_modules/alertifyjs/build/css/themes/semantic.css",
+              "./node_modules/alertifyjs/build/css/themes/semantic.min.css"
+            ],
+            "scripts": [
+              "./node_modules/alertifyjs/build/alertify.js",
+              "./node_modules/alertifyjs/build/alertify.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -58,7 +58,7 @@ declare let alertify: any;
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // habilita <iconify-icon>
 })
-export class SistemaRoles implements OnInit {
+export class SistemaRoles implements OnInit, AfterViewInit {
   private _liveAnnouncer = inject(LiveAnnouncer);
   value = '';
   element = true;
@@ -79,6 +79,7 @@ export class SistemaRoles implements OnInit {
   dataSave: rolesInterfaz = {
     name: '',
   };
+  // Suscripción para transformar a mayúsculas this.dataForm.get('name')?.valueChanges.subscribe(val => { if (val) { this.dataForm.get('name')?.setValue(val.toUpperCase(), { emitEvent: false }); } });
   @ViewChild('dialogAdd') dialogAdd!: TemplateRef<any>;
   @ViewChild('dialogDelete') dialogDelete!: TemplateRef<any>;
   @ViewChild('dialogUpdate') dialogUpdate!: TemplateRef<any>;
@@ -92,34 +93,40 @@ export class SistemaRoles implements OnInit {
   private dialog = inject(MatDialog);
   private dataService = inject(RolesServicesService);
   ngOnInit(): void {
+    this.form.get('name')?.valueChanges.subscribe((val) => {
+      if (val) {
+        this.form.get('name')?.setValue(val.toUpperCase(), { emitEvent: false });
+      }
+    });
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((value) => {
         const safeValue = (value ?? '').trim(); // si es null, usa ''
         if (safeValue) {
-          // hay texto → aplica filtro
           this.filter = safeValue;
           // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
           this.dataService.roles$.subscribe((data) => {
             this.dataSource.data = data;
           });
-          // fuerza el pageSize a 1
           this.loadData(this.filter);
         } else {
-          this.sortBandera = 3;
+         /* this.sortBandera = 3;
           this.myMatSort.active = 'id'; // ninguna columna activa
           this.myMatSort.direction = 'desc'; // sin dirección      this.myMatSort.direction = ''; // sin dirección
           this.pageSize = 5; // valor inicial
           this.pageIndex = 0; // empieza en la primera página
-          //this.dataSource.data = [...this.dataSource.data, data];
-          //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
           this.paginator.firstPage(); // mueve el paginador a la última página
-
-          this.filter = '';
+          //this.filter = '';*/
           this.initTable(); // no hay texto → reinicia tabla
         }
       });
+  }
 
+  form = new FormGroup({
+    name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
+  });
+
+  ngAfterViewInit() {
     //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
     this.dataSource = new MatTableDataSource<any>();
     // Consulta inicial al backend al entrar o recargar
@@ -134,10 +141,6 @@ export class SistemaRoles implements OnInit {
       this.total = total;
     });
   }
-
-  form = new FormGroup({
-    name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
-  });
   resetSort() {
     if (this.myMatSort) {
       this.sortBandera = 3;
@@ -169,16 +172,16 @@ export class SistemaRoles implements OnInit {
       limit: this.pageSize,
       offset: this.pageIndex * this.pageSize,
       query: filterValue ? { name: filterValue } : {},
-      sort: this.myMatSort
-        ? { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? 1 : -1 }
-        : { name: 1 },
+      sort: sortObj,
     };
     this.dataService.doFilter(query).subscribe((res) => {
       this.data = res.data; // registros de la página
       console.log(this.data);
       this.total = res.count; // total
+      this.dataSource.data = res.data; // refresca la tabla
+       this.dataService.dataTablePagination(query).subscribe();
     });
-    this.dataService.dataTablePagination(query).subscribe();
+   
 
     // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
     this.dataService.roles$.subscribe((data) => {
@@ -226,12 +229,7 @@ export class SistemaRoles implements OnInit {
           sort: { _id: -1 },
         };
       }
-      this.dataService.doFilter(this.filter).subscribe((res) => {
-        this.data = res.data; // registros de la página
-        this.data;
-        console.log(this.data);
-        this.total = res.count; // total
-      });
+      this.loadData(this.filter);
     } else {
       this.resetFilter();
     }
@@ -292,42 +290,6 @@ export class SistemaRoles implements OnInit {
     }
 
     // recarga datos con el nuevo orden
-  }
-
-  doFilter00000(filterValue: string) {
-    if (filterValue.length > 0) {
-      this.filter = filterValue;
-      if (this.sortBandera == 1) {
-        this.query = {
-          limit: this.total,
-          offset: (this.page - 1) * this.limit,
-          query: { name: filterValue },
-          sort: { name: 1 },
-        };
-      }
-
-      if (this.sortBandera == 2) {
-        this.query = {
-          limit: this.total,
-          offset: (this.page - 1) * this.limit,
-          query: { name: filterValue },
-          sort: { name: -1 },
-        };
-      }
-
-      if (this.sortBandera == 3) {
-        this.query = {
-          limit: this.total,
-          offset: (this.page - 1) * this.limit,
-          query: { name: filterValue },
-          sort: { _id: -1 },
-        };
-      }
-
-      this.changeTable(this.query);
-    } else {
-      this.resetFilter();
-    }
   }
 
   getData(ide1: any) {
@@ -483,25 +445,106 @@ export class SistemaRoles implements OnInit {
   }
 
   /*************************************************************************************************/
+  ActuallyTable() {
+    this.dataService.dataTablePagination(this.query).subscribe();
+    // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
+    this.dataService.roles$.subscribe((data) => {
+      this.dataSource.data = data;
+    });
+  }
+
+  clearSearch() {
+    this.searchControl.setValue('');
+    this.doFilter(''); // opcional: refresca la tabla sin filtro
+  }
+
+  closedModal() {
+    this.myMatSort.active = 'id';
+    this.form.reset();
+    this.dialog.closeAll();
+  }
+
+  deleteData(): void {
+    this.dataService.remove(this.dataDelete).subscribe({
+      next: () => {
+        this.ActuallyTable();
+        alertify.success('Se elimino correctamente');
+      },
+      error: () => {
+        alertify.error('Se desconecto el servidor');
+      },
+    });
+  }
+
+  openModalDelete(ide: any, name: any) {
+    this.dataDelete = ide;
+    this.nameDelete = name;
+    this.clearSearch();
+    this.dialog.open(this.dialogDelete, { width: '400px', height: '400px', disableClose: true });
+  }
+
+  openModalSave() {
+    this.form.reset();
+    this.clearSearch();
+    this.dialog.open(this.dialogAdd, {
+      width: '900px',
+      height: '400px',
+      disableClose: true,
+    });
+  }
+
+  openModalUpdate(ide: any, name: any) {
+    this.dataUpdate = ide;
+    this.dataSave.name = name;
+    //this.clearSearch();
+    this.dialog.open(this.dialogUpdate, { width: '400px', disableClose: true });
+  }
+
   saveData() {
     if (this.form.valid) {
       this.dataService.save(this.form.value as rolesInterfaz).subscribe({
         next: () => {
           this.ActuallyTable();
-          this.paginator.firstPage(); // mueve el paginador a la última página
-          this.closedModalSave();
-          //this.clearSearch();
-          //this.resetFilter();
+          this.closedModal();
+          alertify.success('Se guardo correctamente');
         },
-        error: (err) => {
-          console.error('Error al guardar', err);
+        error: () => {
+          alertify.error('Se desconecto el servidor');
         },
       });
     }
   }
-  clearSearch() {
-    this.searchControl.setValue('');
-    this.doFilter(''); // opcional: refresca la tabla sin filtro
+
+  updateData() {
+    if (this.form.valid) {
+      this.dataService.update(this.dataUpdate, this.dataSave).subscribe({
+        next: (res) => {
+          if (this.filter.length > 0) {
+            
+            if (res.pageIndex !== undefined) {
+              this.pageIndex = res.pageIndex;
+              const prueba = this.pageIndex;
+              console.log('seraaa q entraaa'+prueba);
+            }
+            this.loadData(this.filter);
+            this.closedModal();
+            
+            //this.clearSearch();
+          } else {
+            this.ActuallyTable();
+            this.closedModal();
+          }
+
+          alertify.success('Se modifico correctamente');
+          //this.clearSearch();
+        },
+        error: () => {
+          alertify.error('Se desconecto el servidor');
+        },
+      });
+    } else {
+      alertify.info('formulario no valido');
+    }
   }
 
   resetFilter() {
@@ -526,7 +569,7 @@ export class SistemaRoles implements OnInit {
         console.log(this.dataSource.data);
       },
       (err) => {
-        console.log('error ws: ');
+        alertify.error('Se desconecto el servidor de la lista');
       },
     );
   }
@@ -534,81 +577,9 @@ export class SistemaRoles implements OnInit {
     return (this.element = true);
   }
 
-  openModalSave() {
-    this.form.reset();
-    this.clearSearch();
-    this.dialog.open(this.dialogAdd, {
-      width: '900px',
-      height: '400px',
-      disableClose: true,
-    });
-  }
-
-  closedModalSave() {
-    this.myMatSort.active = 'id'; // ninguna columna activa
-    this.form.reset();
-    this.dialog.closeAll();
-  }
-  ActuallyTable() {
-    // Primera carga rápida
-    this.dataService.dataTablePagination(this.query).subscribe();
-
-    // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
-    this.dataService.roles$.subscribe((data) => {
-      this.dataSource.data = data;
-    });
-  }
   dataDelete: any;
   nameDelete: any;
-  openModalDelete(ide: any, name: any) {
-    console.log('ID a eliminar:', ide);
-    this.dataDelete = ide;
-    this.nameDelete = name; // Guarda el ID en una propiedad de la clase
-    this.dialog.open(this.dialogDelete, { width: '400px', height: '400px', disableClose: true });
-  }
-  closedModalDelete() {
-    this.form.reset();
-    this.dialog.closeAll();
-  }
-  deleteData(): void {
-    this.dataService.remove(this.dataDelete).subscribe({
-      next: () => {
-        console.log('Se eliminó correctamente');
-        this.ActuallyTable(); // 👈 método único para refrescar
-      },
-      error: (err) => {
-        console.error('Error al eliminar:', err);
-      },
-    });
-  }
-  closedModalUpdate() {
-    this.form.reset();
-    this.dialog.closeAll();
-  }
 
   dataUpdate: any;
   nameUpdate: any;
-  openModalUpdate(ide: any, name: any) {
-    console.log('ID a actualizar:', ide);
-    this.dataUpdate = ide;
-    this.dataSave.name = name; // Guarda el nombre en una propiedad de la clase
-    this.dialog.open(this.dialogUpdate, { width: '400px' });
-  }
-  updateData() {
-    if (this.form.valid) {
-      this.dataService.update(this.dataUpdate, this.dataSave).subscribe({
-        next: () => {
-          this.initTable();
-          this.closedModalUpdate();
-          this.resetFilter();
-          this.paginator.firstPage();
-        },
-        error: (err) => {
-          console.error(err);
-        },
-      });
-    } else {
-      console.error(' Formulario no válido');
-    }
-  }
 }
