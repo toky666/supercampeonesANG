@@ -8,6 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   CUSTOM_ELEMENTS_SCHEMA,
+  OnDestroy,
 } from '@angular/core';
 import { PageHeader } from '@shared';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,10 +28,10 @@ import {
 import { RolesServicesService } from '../../services/roles-services.service';
 import { rolesInterfaz } from '../../Interfaces/rolesInterfaz';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Subject, takeUntil } from 'rxjs';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
 
@@ -58,12 +59,12 @@ declare let alertify: any;
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // habilita <iconify-icon>
 })
-export class SistemaRoles implements OnInit, AfterViewInit {
+export class SistemaRoles implements OnInit, AfterViewInit, OnDestroy {
   private _liveAnnouncer = inject(LiveAnnouncer);
   value = '';
   element = true;
   displayedColumns: string[] = ['nombre', 'action'];
-  dataSource: any;
+  dataSource = new MatTableDataSource<any>();
   public page = 1;
   public total = 0;
   public query: any = {};
@@ -86,8 +87,9 @@ export class SistemaRoles implements OnInit, AfterViewInit {
   dialogRef!: MatDialogRef<any>;
   @ViewChild(MatSort) myMatSort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatTable) table!: MatTable<any>;
   data: any[] = [];
-
+  private destroy$ = new Subject<void>();
   pageSize = 5;
   pageIndex = 0;
   private dialog = inject(MatDialog);
@@ -98,35 +100,66 @@ export class SistemaRoles implements OnInit, AfterViewInit {
         this.form.get('name')?.setValue(val.toUpperCase(), { emitEvent: false });
       }
     });
-    this.searchControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe((value) => {
-        const safeValue = (value ?? '').trim(); // si es null, usa ''
-        if (safeValue) {
-          this.filter = safeValue;
-          // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
-          this.dataService.roles$.subscribe((data) => {
-            this.dataSource.data = data;
-          });
-          this.loadData(this.filter);
-        } else {
-         /* this.sortBandera = 3;
-          this.myMatSort.active = 'id'; // ninguna columna activa
-          this.myMatSort.direction = 'desc'; // sin dirección      this.myMatSort.direction = ''; // sin dirección
-          this.pageSize = 5; // valor inicial
-          this.pageIndex = 0; // empieza en la primera página
-          this.paginator.firstPage(); // mueve el paginador a la última página
-          //this.filter = '';*/
-          this.initTable(); // no hay texto → reinicia tabla
-        }
+
+    if (this.searchControl.value && this.searchControl.value.trim().length > 0) {
+      console.log('Está lleno');
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged(),
+          map((value) => (value ?? '').trim()),
+          takeUntil(this.destroy$),
+        )
+        .subscribe((safeValue) => {
+          if (safeValue) {
+            this.filter = safeValue;
+            this.loadData(this.filter);
+            console.log('SIIIIIII desde searchcontrol');
+          }
+        });
+      /*
+      this.searchControl.valueChanges
+        .pipe(debounceTime(300), distinctUntilChanged())
+        .subscribe((value) => {
+          const safeValue = (value ?? '').trim(); // si es null, usa ''
+          if (safeValue) {
+            this.filter = safeValue;
+
+            this.loadData(this.filter);
+            console.log('SIIIIIII desde searchcontrol');
+          } else {
+            this.filter = '';
+            this.dataSource.data = []; // o recargar todo
+            console.log('Campo vacío, limpiando resultados');
+          }
+        });*/
+    } else {
+      console.log('Está vacío');
+      this.dataSource = new MatTableDataSource<any>();
+      // Consulta inicial al backend al entrar o recargar
+      this.dataService
+        .dataTablePagination({ limit: 5, offset: 0, query: {}, sort: { _id: -1 } })
+        .subscribe(); // Suscripción reactiva a los datos
+
+      this.dataService.roles$.subscribe((data) => {
+        this.dataSource.data = data;
+        console.log('desde ngafterviewinit 1111111111111');
+      }); // Opcional: suscribirse al total de registros
+      this.dataService.total$.subscribe((total) => {
+        this.total = total;
       });
+    }
   }
 
   form = new FormGroup({
     name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
   });
-
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   ngAfterViewInit() {
+    /*
     //this.myMatSort.sort({ id: '', start: 'desc', disableClear: false });
     this.dataSource = new MatTableDataSource<any>();
     // Consulta inicial al backend al entrar o recargar
@@ -136,10 +169,11 @@ export class SistemaRoles implements OnInit, AfterViewInit {
 
     this.dataService.roles$.subscribe((data) => {
       this.dataSource.data = data;
+      console.log('desde ngafterviewinit 1111111111111');
     }); // Opcional: suscribirse al total de registros
     this.dataService.total$.subscribe((total) => {
       this.total = total;
-    });
+    });*/
   }
   resetSort() {
     if (this.myMatSort) {
@@ -163,30 +197,40 @@ export class SistemaRoles implements OnInit, AfterViewInit {
 
   // Método que carga datos desde el backend
   loadData(filterValue = '') {
-    let sortObj: Record<string, number> = { name: 1 };
-    if (this.myMatSort?.active && this.myMatSort.active.trim() !== '' && this.myMatSort.direction) {
-      sortObj = { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? -1 : 1 };
+    if (filterValue.length > 0) {
+      let sortObj: Record<string, number> = { _id: -1 };
+      if (
+        this.myMatSort?.active &&
+        this.myMatSort.active.trim() !== '' &&
+        this.myMatSort.direction
+      ) {
+        sortObj = { [this.myMatSort.active]: this.myMatSort.direction === 'desc' ? -1 : 1 };
+      }
+
+      const query = {
+        limit: this.pageSize,
+        offset: this.pageIndex * this.pageSize,
+        query: filterValue ? { name: filterValue } : {},
+        sort: sortObj,
+      };
+      this.dataService.doFilter(query).subscribe((res) => {
+        this.data = res.data; // registros de la página
+        this.total = res.count; // total
+        this.dataSource.data = res.data; // refresca la tabla
+        console.log('desde loaddata');
+        console.log(this.dataSource.data);
+
+        // this.dataService.dataTablePagination(query).subscribe();
+      });
     }
-
-    const query = {
-      limit: this.pageSize,
-      offset: this.pageIndex * this.pageSize,
-      query: filterValue ? { name: filterValue } : {},
-      sort: sortObj,
-    };
-    this.dataService.doFilter(query).subscribe((res) => {
-      this.data = res.data; // registros de la página
-      console.log(this.data);
-      this.total = res.count; // total
-      this.dataSource.data = res.data; // refresca la tabla
-       this.dataService.dataTablePagination(query).subscribe();
-    });
-   
-
-    // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
-    this.dataService.roles$.subscribe((data) => {
-      this.dataSource.data = data;
-    });
+    /*else {
+      // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
+      this.dataService.roles$.subscribe((data) => {
+        this.dataSource.data = data;
+        console.log('desde loaddata DE DATASOURCE');
+        console.log(this.dataSource.data);
+      });
+    }*/
   } // Este método lo dispara el MatPaginator automáticamente
   onPageChange(event: any) {
     this.pageSize = event.pageSize;
@@ -262,12 +306,10 @@ export class SistemaRoles implements OnInit, AfterViewInit {
           sort: { _id: -1 },
         };
         this.sortBandera = 3;
-        this.ActuallyTable();
       }
 
       //this.changeFilter();
       this.loadData(this.filter);
-      console.log(this.sortBandera);
       return;
     } else {
       console.log('NO entro');
@@ -285,7 +327,6 @@ export class SistemaRoles implements OnInit, AfterViewInit {
       }
       //this.changeFilter();
       this.ActuallyTable(); // recarga datos con el nuevo orden
-      console.log(this.sortBandera);
       return;
     }
 
@@ -313,7 +354,9 @@ export class SistemaRoles implements OnInit, AfterViewInit {
       sort: { _id: -1 },
     };
     console.log('entro');
+    console.log('desde inittable');
     console.log(this.query);
+
     this.changeFilter();
   }
   changeFilter() {
@@ -375,17 +418,37 @@ export class SistemaRoles implements OnInit, AfterViewInit {
     if (this.filter.length > 0) {
       this.pageSize = event.pageSize;
       this.pageIndex = event.pageIndex;
-
+      if (this.sortBandera == 3) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
+      }
+      if (this.sortBandera == 1) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
+      }
+      if (this.sortBandera == 2) {
+        this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
+      }
       this.loadData(this.filter); // usa el filtro actual
     } else {
       if (this.sortBandera == 3) {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
       }
       if (this.sortBandera == 1) {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
       }
       if (this.sortBandera == 2) {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
+        console.log('ENTRA PAGECHEANGED');
+        console.log(this.sortBandera);
       }
       this.ActuallyTable();
     }
@@ -422,7 +485,7 @@ export class SistemaRoles implements OnInit, AfterViewInit {
       }
 
       //this.changeFilter();
-      this.changeTable(this.query);
+      this.loadData(this.query);
       return;
     } else {
       console.log('NO entro');
@@ -439,7 +502,7 @@ export class SistemaRoles implements OnInit, AfterViewInit {
         this.sortBandera = 3;
       }
       //this.changeFilter();
-      this.changeTable(this.query);
+      this.ActuallyTable();
       return;
     }
   }
@@ -448,14 +511,20 @@ export class SistemaRoles implements OnInit, AfterViewInit {
   ActuallyTable() {
     this.dataService.dataTablePagination(this.query).subscribe();
     // Suscripción reactiva: cada vez que rolesSubject cambie, la tabla se actualiza
-    this.dataService.roles$.subscribe((data) => {
-      this.dataSource.data = data;
-    });
   }
 
   clearSearch() {
     this.searchControl.setValue('');
-    this.doFilter(''); // opcional: refresca la tabla sin filtro
+    //this.doFilter(''); // opcional: refresca la tabla sin filtro
+    //this.paginator.firstPage();
+    //this.initTable();
+    this.pageIndex = 0; // reinicia a la primera página
+    this.pageSize = 5; // valor por defecto (puedes cambiarlo)v
+    this.paginator.firstPage();
+    this.dataService
+      .dataTablePagination({ limit: 5, offset: 0, query: {}, sort: { _id: -1 } })
+      .subscribe();
+    this.filter = '';
   }
 
   closedModal() {
@@ -520,21 +589,37 @@ export class SistemaRoles implements OnInit, AfterViewInit {
       this.dataService.update(this.dataUpdate, this.dataSave).subscribe({
         next: (res) => {
           if (this.filter.length > 0) {
-            
             if (res.pageIndex !== undefined) {
               this.pageIndex = res.pageIndex;
               const prueba = this.pageIndex;
-              console.log('seraaa q entraaa'+prueba);
+              console.log('seraaa q entraaa');
+              console.log(prueba);
             }
             this.loadData(this.filter);
             this.closedModal();
-            
             //this.clearSearch();
           } else {
+            // 🔑 Reaplicar sort después de refrescar datos
+
             this.ActuallyTable();
             this.closedModal();
           }
+          this.dataSource.sort = this.myMatSort;
+          this.myMatSort.active = 'id';
 
+          if (this.myMatSort.direction == 'asc') {
+            this.myMatSort.direction = 'asc'; // o 'desc'
+            this.myMatSort.sortChange.emit({ active: 'id', direction: 'asc' });
+          }
+          if (this.myMatSort.direction == 'desc') {
+            this.myMatSort.direction = 'desc'; // o 'desc'
+            this.myMatSort.sortChange.emit({ active: 'id', direction: 'desc' });
+          }
+          if (this.myMatSort.direction == '') {
+            this.myMatSort.direction = ''; // o 'desc'
+            this.myMatSort.sortChange.emit({ active: 'id', direction: '' });
+          }
+          this.table.renderRows();
           alertify.success('Se modifico correctamente');
           //this.clearSearch();
         },
@@ -566,6 +651,7 @@ export class SistemaRoles implements OnInit, AfterViewInit {
         this.dataSource = new MatTableDataSource();
         this.dataSource.data = data.data;
         this.total = data.count;
+        console.log('desde changetable');
         console.log(this.dataSource.data);
       },
       (err) => {
