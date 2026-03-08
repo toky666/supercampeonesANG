@@ -21,7 +21,7 @@
           matInput
           formControlName="name"
           name="name"
-          [(ngModel)]="dataSave.name"
+          [(ngModel)]="dataRoles.name"
           autocomplete="off"
         />
         @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
@@ -207,7 +207,7 @@
                     matInput
                     formControlName="name"
                     name="name"
-                    [(ngModel)]="dataSave.name"
+                    [(ngModel)]="dataRoles.name"
                     autocomplete="off"
                   />
                   @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {

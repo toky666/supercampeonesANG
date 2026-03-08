@@ -8,8 +8,8 @@ import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
   providedIn: 'root',
 })
 export class RolesServicesService {
-  
   API_ENDPOINT = 'http://localhost:3081/api';
+
   private rolesSubject = new BehaviorSubject<rolesInterfaz[]>([]);
   roles$ = this.rolesSubject.asObservable();
 
@@ -31,29 +31,17 @@ export class RolesServicesService {
   }
 
   save(guardar: rolesInterfaz) {
-    return this.http
-      .post<rolesInterfaz>(
-        this.API_ENDPOINT + '/roles',
-        { data: guardar },
-        { headers: this._header() },
-      )
-      .pipe(
-        tap((nuevo) => {
-          const current = this.rolesSubject.value;
-          this.rolesSubject.next([...current, nuevo]);
-        }),
-      );
+    return this.http.post(
+      this.API_ENDPOINT + '/roles',
+      { data: guardar },
+      { headers: this._header() },
+    );
   }
 
   dataTablePagination(query: any): Observable<any> {
-    return this.http
-      .post(this.API_ENDPOINT + '/roles/datatable', query, { headers: this._header() })
-      .pipe(
-        tap((resp: any) => {
-          this.rolesSubject.next(resp.data); // llena el BehaviorSubject
-          this.totalSubject.next(resp.count); // opcional: total de registros
-        }),
-      );
+    return this.http.post(this.API_ENDPOINT + '/roles/datatable', query, {
+      headers: this._header(),
+    });
   }
 
   doFilter(query: any): Observable<any> {
@@ -105,17 +93,9 @@ export class RolesServicesService {
   }*/
 
   remove(id: any): Observable<any> {
-    return this.http
-      .delete(this.API_ENDPOINT + '/roles/' + id, {
-        headers: this._header(),
-      })
-      .pipe(
-        tap(() => console.log(`Rol ${id} eliminado`)), // logging automático
-        catchError((err) => {
-          console.error('Error eliminando rol:', err);
-          return throwError(() => err); // manejo centralizado de errores
-        }),
-      );
+    return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
+      headers: this._header(),
+    });
   }
 
   searchRoles(search: string): Observable<any> {
