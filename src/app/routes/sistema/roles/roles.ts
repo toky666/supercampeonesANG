@@ -75,6 +75,9 @@ export class SistemaRoles implements OnInit {
   private dialog = inject(MatDialog);
   private dataService = inject(RolesServicesService);
 
+
+
+  
   public page = 1;
   public total = 0;
   public query: any = {};
@@ -266,7 +269,7 @@ export class SistemaRoles implements OnInit {
 
   onSortChange() {
     if (this.filter.length > 0) {
-      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+      if (this.myMatSort.direction === 'asc') {
         this.query = {
           limit: this.total,
           offset: (this.page - 1) * this.limit,
@@ -274,7 +277,7 @@ export class SistemaRoles implements OnInit {
           sort: { name: 1 },
         };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+      if (this.myMatSort.direction === 'desc') {
         this.query = {
           limit: this.total,
           offset: (this.page - 1) * this.limit,
@@ -282,7 +285,7 @@ export class SistemaRoles implements OnInit {
           sort: { name: -1 },
         };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+      if (this.myMatSort.direction === '') {
         this.query = {
           limit: this.total,
           offset: (this.page - 1) * this.limit,
@@ -294,13 +297,13 @@ export class SistemaRoles implements OnInit {
       this.loadData(this.filter);
       return;
     } else {
-      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+      if (this.myMatSort.direction === 'asc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+      if (this.myMatSort.direction === 'desc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+      if (this.myMatSort.direction === '') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
       }
       this.ActuallyTable();
@@ -335,24 +338,24 @@ export class SistemaRoles implements OnInit {
     if (this.filter.length > 0) {
       this.pageSize = event.pageSize;
       this.pageIndex = event.pageIndex;
-      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+      if (this.myMatSort.direction === '') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+      if (this.myMatSort.direction === 'asc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+      if (this.myMatSort.direction === 'desc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
       }
       this.loadData(this.filter); // usa el filtro actual
     } else {
-      if (!this.myMatSort.active || this.myMatSort.direction === '') {
+      if (this.myMatSort.direction === '') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { _id: -1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'asc') {
+      if (this.myMatSort.direction === 'asc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: 1 } };
       }
-      if (!this.myMatSort.active || this.myMatSort.direction === 'desc') {
+      if (this.myMatSort.direction === 'desc') {
         this.query = { limit: this.limit, offset: this.offset, query: {}, sort: { name: -1 } };
       }
       this.ActuallyTable();
@@ -426,4 +429,6 @@ export class SistemaRoles implements OnInit {
       alertify.info('formulario no valido');
     }
   }
+
+  
 }

@@ -91,6 +91,12 @@ export class RolesServicesService {
         })
       );
   }*/
+  // Método para traer todos los registros
+  getAll(): Observable<any[]> {
+    return this.http.get<any[]>(this.API_ENDPOINT);
+  }
+
+
 
   remove(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
