@@ -25,6 +25,7 @@
       "@theme/*": ["src/app/theme/*"],
       "@env": ["src/environments"],
       "@env/*": ["src/environments/*"],
+      "@sass/*": ["src/sass/*"],
       "@styles/*": ["src/styles/*"]
     }
   },

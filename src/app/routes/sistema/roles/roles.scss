@@ -1,3 +1,43 @@
+@use '../../../../../src/sass/variables' as *;
+@use '../../../../../src/sass/title';
+@use '../../../../../src/sass/mixin' as *;
+@use '../../../../../src/sass/propiedades';
+
+
+
+.example-full-width {
+  @include decoration(100%, 14%, small, 5px, 5px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+.example-full-width1 {
+  @include decoration(80%, 14%, small, 5px, 5px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+@media screen and (min-width: 0px) and (max-width: 800px) {
+  .example-full-width1 {
+    @include decoration(80%, 14%, small, 5px, 5px);
+    input {
+      @include textoMayuscula(uppercase);
+    }
+  }
+  .modalImageDelete {
+    width: 50px;
+    height: 50px;
+  }
+  .definicionPrincipal {
+    display: none;
+  }
+  .vistaUsers {
+    width: 100%;
+  }
+}
+
+
+
 input.ng-valid {
   border: 2px solid green;
 }
