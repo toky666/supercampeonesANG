@@ -9,6 +9,10 @@
 .unidos {
   display: flex;
 }
+// propiedades de dialog
+::ng-deep .mat-mdc-dialog-surface{
+  border-radius: 0 !important;
+}
 // propiedades de tabla
 .example-container {
   width: 100%;
@@ -24,7 +28,7 @@ table {
   background-color: $colorAzul;
   height: 90px;
   margin-top: -40px !important;
-  margin-bottom: 20px;
+  margin-bottom: 75px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -41,15 +45,15 @@ table {
   padding-left: 5%;
   padding-right: 5%;
   margin-bottom: -74px;
-  margin-top: 28px;
+  margin-top: 34px;
   z-index: 2;
 }
-th.mat-header-cell {
+th.mat-mdc-header-cell {
   text-align: center;
   background: $colorBlanco;
   color: $colorAzul;
   font-size: 14px;
-  padding-top: 79px;
+  padding-top: 25px;
   padding-bottom: 16px;
   font-weight: 600;
   align-content: center;

@@ -17,7 +17,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
-
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NgClass } from '@angular/common'; // 👈 importa NgClass
 import {
   ReactiveFormsModule,
   FormControl,
@@ -52,6 +53,8 @@ declare let alertify: any;
     MatFormFieldModule,
     MatFormFieldModule,
     ReactiveFormsModule,
+    NgClass, 
+    TranslateModule,
   ],
   templateUrl: './roles.html',
   standalone: true,
@@ -60,7 +63,6 @@ declare let alertify: any;
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // habilita <iconify-icon>
 })
 export class SistemaRoles implements OnInit {
-
   dataRoles: rolesInterfaz = {
     name: '',
   };
@@ -74,10 +76,9 @@ export class SistemaRoles implements OnInit {
 
   private dialog = inject(MatDialog);
   private dataService = inject(RolesServicesService);
+  // ✅ Usamos inject en lugar de constructor
+  private translate = inject(TranslateService);
 
-
-
-  
   public page = 1;
   public total = 0;
   public query: any = {};
@@ -110,6 +111,8 @@ export class SistemaRoles implements OnInit {
       }
     });
 
+    
+    this.translate.use('en-US'); // idioma inicial
     this.refreshData();
   }
 
@@ -320,8 +323,9 @@ export class SistemaRoles implements OnInit {
   openModalSave() {
     this.dialog.open(this.dialogAdd, {
       width: '900px',
-      height: '400px',
+      height: '250px',
       disableClose: true,
+      panelClass: 'square-dialog'  // clase personalizada
     });
   }
 
@@ -429,6 +433,4 @@ export class SistemaRoles implements OnInit {
       alertify.info('formulario no valido');
     }
   }
-
-  
 }

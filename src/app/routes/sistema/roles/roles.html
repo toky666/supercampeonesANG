@@ -2,20 +2,25 @@
 <!-- modal de guardar -->
 <ng-template #dialogAdd>
   <div class="modal-header">
-    <h4 class="modal-title pull-left" class="titulo">
+    <h4 class="titulo">
       <div class="alinearIconsTitle">
-        <span class="material-icons"> bookmark </span>
-        <iconify-icon icon="icon-park-solid:system" width="50" height="50" />
+        <iconify-icon icon="ic:twotone-assignment-ind" width="30" height="30" />{{
+          'menu.roles.titulo.add' | translate
+        }}
       </div>
+      <iconify-icon
+        class="closeDialogIconify"
+        icon="line-md:close-square-twotone"
+        width="28"
+        height="28"
+        (click)="closedModal()"
+      />
     </h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="closedModal()">
-      <span aria-hidden="true">&times;</span>
-    </button>
   </div>
   <div class="modal-body">
     <form [formGroup]="form" (ngSubmit)="f.form.valid && saveData()" #f="ngForm" novalidate>
-      <mat-form-field class="example-full-width" appearance="outline">
-        <mat-label for="name">Name</mat-label>
+      <mat-form-field class="inputSave" appearance="outline">
+        <mat-label for="name">{{ 'menu.roles.name' | translate }}</mat-label>
 
         <input
           matInput
@@ -25,7 +30,9 @@
           autocomplete="off"
         />
         @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-          <mat-error>Name is <strong>required</strong></mat-error>
+          <mat-error
+            ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+          >
         }
         @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
           <mat-error>Minimum 3 characters required</mat-error>
@@ -35,18 +42,23 @@
   </div>
   <div class="modal-footer">
     <button
-      class="btn btn-success"
+      mat-flat-button
       type="submit"
       [disabled]="form.invalid"
+      [ngClass]="form.valid ? 'btnSuccess' : 'btnNeutro'"
       (click)="saveData()"
     >
       <div class="alinearIconsButton">
-        <span class="material-icons"> cloud </span>
-        guardar
+        <iconify-icon icon="material-symbols:cloud" width="25" height="25" />
+        {{ 'menu.principal.guardar' | translate }}
       </div>
     </button>
-    <button type="button" class="btn btn-danger" (click)="closedModal()">
-      <div class="alinearIconsButton"><span class="material-icons"> cancel </span>cerrar</div>
+    <button mat-flat-button type="button" class="btnDanger" (click)="closedModal()">
+      <div class="alinearIconsButton">
+        <iconify-icon icon="ep:circle-close-filled" width="25" height="25" />{{
+          'menu.principal.cerrar' | translate
+        }}
+      </div>
     </button>
   </div>
 </ng-template>
@@ -55,8 +67,11 @@
 <div class="presentacionPrincipal">
   <div class="definicionPrincipal">
     <div class="definicionUsers">
+      <div>
+        <img src="/images/role.png" alt="profile" class="userLogo" />
+      </div>
       <div class="presentacionLetras">
-        <p>parrafo</p>
+        <p>{{ 'menu.roles.parrafoRoles' | translate }}</p>
       </div>
     </div>
   </div>
@@ -66,23 +81,24 @@
     <div class="vista1">
       {{ this.total }}
     </div>
-    <div class="vista2">tabla</div>
+    <div class="vista2">{{ 'menu.roles.table.name' | translate }}</div>
 
     <div class="vista3">
-      <button mat-flat-button class="btnAdicionar" (click)="openModalSave()">
+      <button mat-flat-button class="btnInfo" (click)="openModalSave()">
         <div class="alinearIconsButton">
-          <span class="material-icons">add_circle </span>
-          adccionar roles
+          <iconify-icon icon="icon-park-twotone:add-one" width="30" height="30" />
+          {{ 'menu.principal.adicionar' | translate }} {{ 'menu.sistema.roles' | translate }}
         </div>
       </button>
     </div>
   </div>
 </div>
 
-<div class="example-container mat-elevation-z8">
+<div class="vistaTable">
+<div class="example-container">
   <div class="uni">
-    <mat-form-field class="example-full-width1" appearance="outline">
-      <mat-label for="obs">buscar</mat-label>
+    <mat-form-field class="inputFind" appearance="outline">
+      <mat-label for="obs">{{ 'menu.principal.buscar' | translate }}</mat-label>
       <input
         matInput
         [formControl]="searchControl"
@@ -97,8 +113,13 @@
       }
     </mat-form-field>
   </div>
+
   <div id="panel-table">
-    <div class="tituloTabla">titulo</div>
+    <mat-card class="card-table" appearance="outlined">
+      
+        {{ 'menu.roles.titulo.table' | translate }}
+     
+    </mat-card>
   </div>
   <div class="table-container">
     <table
@@ -110,12 +131,16 @@
       (matSortChange)="onSortChange()"
     >
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="id" class="tableHeader" >nombre</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="id" class="tableHeader">
+          {{ 'menu.roles.table.name' | translate }}
+        </th>
         <td mat-cell *matCellDef="let producto">{{ producto.name }}</td>
       </ng-container>
 
       <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef class="tableHeader">acciones</th>
+        <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          {{ 'menu.principal.table.actions' | translate }}
+        </th>
         <td mat-cell *matCellDef="let producto">
           <button
             mat-icon-button
@@ -142,7 +167,9 @@
                 <div class="textoEliminar">
                   <div>
                     <h4>
-                      <b><p>confirmar</p></b>
+                      <b
+                        ><p>{{ 'menu.roles.delete.confirmar' | translate }}</p></b
+                      >
                     </h4>
                   </div>
                   <div>
@@ -159,7 +186,8 @@
                   mat-dialog-close
                 >
                   <div class="alinearIconsButton">
-                    <span class="material-icons"> check_circle </span>si
+                    <span class="material-icons"> check_circle </span
+                    >{{ 'menu.principal.delete.confirmar.si' | translate }}si
                   </div>
                 </button>
                 <button
@@ -170,7 +198,7 @@
                 >
                   <div class="alinearIconsButton">
                     <span class="material-icons"> cancel </span>
-                    no
+                    {{ 'menu.principal.delete.confirmar.no' | translate }}
                   </div>
                 </button>
               </div>
@@ -182,7 +210,8 @@
             <div class="modal-header">
               <h4 class="modal-title pull-left" class="titulo">
                 <div class="alinearIconsTitle">
-                  <span class="material-icons"> bookmark </span>modificar
+                  <span class="material-icons"> bookmark </span
+                  >{{ 'menu.roles.titulo.modify' | translate }}
                 </div>
               </h4>
               <button
@@ -202,7 +231,7 @@
                 novalidate
               >
                 <mat-form-field class="example-full-width" appearance="outline">
-                  <mat-label for="name">nombre</mat-label>
+                  <mat-label for="name">{{ 'menu.roles.name' | translate }}</mat-label>
                   <input
                     matInput
                     formControlName="name"
@@ -211,7 +240,9 @@
                     autocomplete="off"
                   />
                   @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-                    <mat-error>Name is <strong>required</strong></mat-error>
+                    <mat-error
+                      ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                    >
                   }
                   @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
                     <mat-error>Minimum 3 characters required</mat-error>
@@ -222,13 +253,14 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-success" (click)="updateData()">
                 <div class="alinearIconsButton">
-                  <span class="material-icons"> edit </span>modificar
+                  <span class="material-icons"> edit </span
+                  >{{ 'menu.principal.modify' | translate }}
                 </div>
               </button>
               <button type="button" class="btn btn-danger" (click)="closedModal()">
                 <div class="alinearIconsButton">
                   <span class="material-icons"> cancel </span>
-                  cerrar
+                  {{ 'menu.principal.cerrar' | translate }}
                 </div>
               </button>
             </div>
@@ -243,10 +275,11 @@
   </div>
 </div>
 
+<mat-paginator
+  [length]="total"
+  [pageSize]="limit"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="pageChanged($event)"
+/>
+</div>
 
-  <mat-paginator
-    [length]="total"
-    [pageSize]="limit"
-    [pageSizeOptions]="pageSizeOptions"
-    (page)="pageChanged($event)"
-  />

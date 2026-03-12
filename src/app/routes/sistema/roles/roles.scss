@@ -1,17 +1,17 @@
 @use '../../../../../src/sass/variables' as *;
 @use '../../../../../src/sass/title';
 @use '../../../../../src/sass/mixin' as *;
-@use '../../../../../src/sass/propiedades';
+@use '../../../../../src/sass/propiedades' as *;
 
 
 
-.example-full-width {
-  @include decoration(100%, 14%, small, 5px, 5px);
+.inputSave {
+  @include decoration(100%, 14%, small, 50px, 50px);
   input {
     @include textoMayuscula(uppercase);
   }
 }
-.example-full-width1 {
+.inputFind{
   @include decoration(80%, 14%, small, 5px, 5px);
   input {
     @include textoMayuscula(uppercase);

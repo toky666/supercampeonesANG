@@ -1,12 +1,13 @@
 // @import "../../../../styles/sass/variables";
-@use "@../../../sass/variables" as *;
+@use '@../../../sass/variables' as *;
 
 .titulo {
-  // padding-top: 12px;
-  // padding-bottom: 12px;
+  display: flex;
   text-align: center;
   font-weight: 900;
-  color: $colorBlanco;
+  color: #fff;
+  justify-content: space-between;
+  margin-top: 0.6rem;
 }
 .titulo1 {
   // padding-top: 12px;
@@ -19,6 +20,16 @@
 
 .modal-header {
   background-color: $colorAzul;
+  height: 3rem;
+}
+
+.modal-body {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.closeDialogIconify {
+  cursor: pointer;
 }
 
 .close {
@@ -27,9 +38,11 @@
 .alinearIconsButton {
   display: flex;
   align-items: center;
-  width: 75px;
+  width: 10rem;
   justify-content: space-around;
+  gap: 1rem;
 }
+
 .alinearIconsTableHeader {
   display: flex;
   align-items: center;
@@ -38,6 +51,8 @@
 .alinearIconsTitle {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  padding-left: 2rem;
 }
 
 .modal-footer {
@@ -82,7 +97,7 @@
 }
 .definicionUsers {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   width: 70%;
   padding-left: 40px;
   font-weight: 500;
@@ -115,12 +130,23 @@
   justify-content: center;
   display: flex;
 }
-.btnAdicionar {
+.btnInfo {
   color: $colorBlanco;
   background-color: $colorAzul;
   width: 80%;
   justify-content: center;
   display: flex;
+}
+.btnDanger {
+  background-color: $colorRojo !important;
+}
+.btnSuccess {
+  background-color: $colorVerde !important;
+  color: $colorBlanco;
+}
+.btnNeutro {
+  background-color: $colorGray;
+  color: white;
 }
 .modalImageDelete {
   width: 100px;
@@ -132,3 +158,11 @@
   height: 70px;
 }
 /////////// final panel principal adicionar y buscar
+///propiedad de table
+.vistaTable {
+  background-color: #fff;
+  filter: drop-shadow(0 1px 3px $colorAzul);
+  width: 100%;
+  text-align: center;
+  color: $colorAzul;
+}
