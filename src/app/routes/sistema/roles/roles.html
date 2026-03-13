@@ -144,20 +144,24 @@
         <td mat-cell *matCellDef="let producto">
           <button
             mat-icon-button
-            matTooltip="edit"
+            class="prueba"
+            #tooltip="matTooltip"
+            matTooltip="{{ 'menu.principal.edit' | translate }}"
             matTooltipPosition="below"
-            matTooltipClass="example-tooltip-red"
+            matTooltipClass="hola1"
             (click)="openModalUpdate(producto._id, producto.name)"
           >
-            <mat-icon class="icon10"> edit </mat-icon>
+            <iconify-icon class="iconEdit" icon="tdesign:edit-filled" width="24" height="24" />
           </button>
           <button
             mat-icon-button
-            matTooltip="eliminar"
+            #tooltip="matTooltip"
+            matTooltip="{{ 'menu.principal.delete' | translate }}"
             matTooltipPosition="below"
+            matTooltipClass="hola2"
             (click)="openModalDelete(producto._id, producto.name)"
           >
-            <mat-icon color="warn" class="mat-18 mat-color-primary"> delete </mat-icon>
+            <iconify-icon class="iconDelete" icon="mdi:delete" width="24" height="24" />
           </button>
           <!-- modal de eliminar -->
           <ng-template #dialogDelete>

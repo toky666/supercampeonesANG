@@ -136,17 +136,21 @@
   width: 80%;
   justify-content: center;
   display: flex;
+  border-radius: 7px;
 }
 .btnDanger {
   background-color: $colorRojo !important;
+  border-radius: 7px;
 }
 .btnSuccess {
   background-color: $colorVerde !important;
   color: $colorBlanco;
+  border-radius: 7px;
 }
 .btnNeutro {
   background-color: $colorGray;
   color: white;
+  border-radius: 7px;
 }
 .modalImageDelete {
   width: 100px;

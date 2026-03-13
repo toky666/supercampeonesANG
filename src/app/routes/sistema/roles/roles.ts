@@ -32,6 +32,8 @@ import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {MatTooltipModule} from '@angular/material/tooltip';
+
 import { debounceTime, distinctUntilChanged, map, Subject, takeUntil } from 'rxjs';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
@@ -54,6 +56,7 @@ declare let alertify: any;
     MatFormFieldModule,
     ReactiveFormsModule,
     NgClass, 
+    MatTooltipModule,
     TranslateModule,
   ],
   templateUrl: './roles.html',
