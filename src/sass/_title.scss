@@ -35,7 +35,8 @@
 .close {
   color: #fff;
 }
-.alinearIconsButton {
+
+.alinearIconsButtonAdd, .alinearIconsButton {
   display: flex;
   align-items: center;
   width: 10rem;
@@ -62,8 +63,9 @@
 
 #delete-confirmation {
   display: flex;
-  padding: 15px;
   justify-content: center;
+  font-weight: bold;
+  color: $colorAzul;
 }
 .parrafo {
   padding-top: 20px;
@@ -84,8 +86,8 @@
 }
 .partePrincipalEliminar {
   display: flex;
-  padding: 9px 5px 20px 5px;
-  justify-content: space-between;
+  padding: 10px 5px 20px 5px;
+  justify-content: space-around;
 }
 ///////panel principal adicionar y buscar
 .presentacionPrincipal {
@@ -169,4 +171,11 @@
   width: 100%;
   text-align: center;
   color: $colorAzul;
+}
+
+@media screen and (min-width: 0px) and (max-width: 800px) {
+  .alinearIconsButton {
+    width: 5rem;
+    justify-content: center;
+  }
 }

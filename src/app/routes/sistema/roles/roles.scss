@@ -3,36 +3,18 @@
 @use '../../../../../src/sass/mixin' as *;
 @use '../../../../../src/sass/propiedades' as *;
 
-
-
-.inputSave {
+.inputSave,
+.inputUpdate {
   @include decoration(100%, 14%, small, 50px, 50px);
   input {
     @include textoMayuscula(uppercase);
   }
 }
-.inputFind{
+
+.inputFind {
   @include decoration(80%, 14%, small, 5px, 5px);
   input {
     @include textoMayuscula(uppercase);
-  }
-}
-@media screen and (min-width: 0px) and (max-width: 800px) {
-  .example-full-width1 {
-    @include decoration(80%, 14%, small, 5px, 5px);
-    input {
-      @include textoMayuscula(uppercase);
-    }
-  }
-  .modalImageDelete {
-    width: 50px;
-    height: 50px;
-  }
-  .definicionPrincipal {
-    display: none;
-  }
-  .vistaUsers {
-    width: 100%;
   }
 }
 
@@ -43,12 +25,19 @@ input.ng-valid {
 input.ng-invalid.ng-touched {
   border: 2px solid red;
 }
-.example-form {
-  min-width: 150px;
-  max-width: 500px;
-  width: 100%;
-}
 
-.example-full-width {
-  width: 100%;
+@media screen and (min-width: 0px) and (max-width: 800px) {
+  .inputSave,
+  .inputUpdate {
+    @include decoration(100%, 14%, small, 5px, 5px);
+    input {
+      @include textoMayuscula(uppercase);
+    }
+  }
+  .definicionPrincipal {
+    display: none;
+  }
+  .vistaUsers {
+    width: 100%;
+  }
 }

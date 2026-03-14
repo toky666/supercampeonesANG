@@ -1,14 +1,11 @@
 import {
   ChangeDetectionStrategy,
-  AfterViewInit,
   Component,
   inject,
   OnInit,
   TemplateRef,
   ViewChild,
-  ViewEncapsulation,
   CUSTOM_ELEMENTS_SCHEMA,
-  OnDestroy,
 } from '@angular/core';
 import { PageHeader } from '@shared';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { NgClass } from '@angular/common'; // 👈 importa NgClass
+import { NgClass } from '@angular/common'; // importa NgClass
 import {
   ReactiveFormsModule,
   FormControl,
@@ -28,13 +25,11 @@ import {
 } from '@angular/forms';
 import { RolesServicesService } from '../../services/roles-services.service';
 import { rolesInterfaz } from '../../Interfaces/rolesInterfaz';
-import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { debounceTime, distinctUntilChanged, map, Subject, takeUntil } from 'rxjs';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
 
@@ -55,7 +50,7 @@ declare let alertify: any;
     MatFormFieldModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    NgClass, 
+    NgClass,
     MatTooltipModule,
     TranslateModule,
   ],
@@ -114,7 +109,6 @@ export class SistemaRoles implements OnInit {
       }
     });
 
-    
     this.translate.use('en-US'); // idioma inicial
     this.refreshData();
   }
@@ -152,6 +146,7 @@ export class SistemaRoles implements OnInit {
     this.dataService.remove(this.dataDelete).subscribe({
       next: () => {
         this.clearSearch();
+        this.closedModal();
         alertify.success('Se elimino correctamente');
       },
       error: () => {
@@ -195,6 +190,8 @@ export class SistemaRoles implements OnInit {
         };
       }
       this.loadData(this.filter);
+    }else{
+      this.refreshData();
     }
   }
 
@@ -320,7 +317,12 @@ export class SistemaRoles implements OnInit {
   openModalDelete(ide: any, name: any) {
     this.dataDelete = ide;
     this.nameDelete = name;
-    this.dialog.open(this.dialogDelete, { width: '400px', height: '400px', disableClose: true });
+    this.dialog.open(this.dialogDelete, {
+      width: '900px',
+      height: '250px',
+      disableClose: true,
+      panelClass: 'square-dialog',
+    });
   }
 
   openModalSave() {
@@ -328,14 +330,19 @@ export class SistemaRoles implements OnInit {
       width: '900px',
       height: '250px',
       disableClose: true,
-      panelClass: 'square-dialog'  // clase personalizada
+      panelClass: 'square-dialog', // clase personalizada
     });
   }
 
   openModalUpdate(ide: any, name: any) {
     this.dataUpdate = ide;
     this.dataRoles.name = name;
-    this.dialog.open(this.dialogUpdate, { width: '400px', disableClose: true });
+    this.dialog.open(this.dialogUpdate, {
+      width: '900px',
+      height: '250px',
+      disableClose: true,
+      panelClass: 'square-dialog',
+    });
   }
 
   pageChanged(event: any): void {

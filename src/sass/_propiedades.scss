@@ -6,13 +6,11 @@
   align-items: center;
   padding-top: 8px;
 }
-.unidos {
-  display: flex;
-}
-.iconEdit{
+
+.iconEdit {
   color: $colorVerde;
 }
-.iconDelete{
+.iconDelete {
   color: $colorRojo;
 }
 // propiedades de dialog
@@ -32,8 +30,8 @@ table {
 .card-table {
   width: 100%;
   background-color: $colorAzul;
-  height: 90px;
-  margin-top: -40px !important;
+  height: 60px;
+  margin-top: -42px !important;
   margin-bottom: 75px;
   justify-content: center;
   align-items: center;
@@ -43,6 +41,8 @@ table {
   color: $colorBlanco;
   font-size: 20px;
   font-weight: 500;
+  border: 2px solid $colorAzul;
+  filter: drop-shadow(0 0 12px $colorAzul);
 }
 #panel-table {
   position: relative;
@@ -50,7 +50,7 @@ table {
   overflow: visible;
   padding-left: 5%;
   padding-right: 5%;
-  margin-bottom: -74px;
+  margin-bottom: -90px;
   margin-top: 34px;
   z-index: 2;
 }
@@ -79,9 +79,6 @@ th.mat-mdc-header-cell {
 }
 
 ::ng-deep .mat-mdc-form-field {
-  //display: table-cell !important;
-  //max-width: 0 !important;
-  //width: 100% !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -89,7 +86,6 @@ th.mat-mdc-header-cell {
   background: $colorBlanco !important;
   text-align: center !important;
   font-size: 14px !important;
-  //height: 16px !important;
 }
 
 ::ng-deep .mat-mdc-paginator-container {
@@ -109,16 +105,6 @@ th.mat-mdc-header-cell {
   margin: 0 0 0 6px !important;
   color: $colorAzul !important;
 }
-// fin tabla
-// propiedades de tooltip
-/*::ng-deep .hola {
-  color: red!important;
-  background-color: white !important;
-  text-align: center !important;
-  filter: drop-shadow(0 1px 3px $colorVerde) !important;
-}*/
-
-// fin tooltip
 
 /* Tooltip verde para botón Edit */
 ::ng-deep .mat-mdc-tooltip.hola1 .mat-mdc-tooltip-surface {
@@ -130,4 +116,9 @@ th.mat-mdc-header-cell {
 ::ng-deep .mat-mdc-tooltip.hola2 .mat-mdc-tooltip-surface {
   background-color: $colorRojo !important; /* rojo Material */
   color: $colorBlanco !important;
+}
+@media screen and (min-width: 0px) and (max-width: 800px) {
+  table {
+  width: 300px;
+}
 }
