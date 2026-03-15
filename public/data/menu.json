@@ -14,7 +14,7 @@
       "route": "sistema",
       "name": "sistema",
       "type": "sub",
-      "icon": "business_center",
+      "icon": "computer",
       "children": [
         {
           "route": "roles",
@@ -23,6 +23,25 @@
           "icon": "radio_button_checked"
         }
       ]
+    },
+    {
+      "route": "usuarios",
+      "name": "usuarios",
+      "type": "sub",
+      "icon": "account_circle",
+      "children": [{
+        "route": "add-usuarios",
+        "name": "add-usuarios",
+        "type": "link",
+        "icon":"radio_button_checked"
+      },
+      {
+        "route": "list-usuarios",
+        "name": "list-usuarios",
+        "type": "link",
+        "icon":"radio_button_checked"
+      }
+    ]
     },
     {
       "route": "/",

@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
 
 @Injectable({
@@ -9,12 +8,6 @@ import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
 })
 export class RolesServicesService {
   API_ENDPOINT = 'http://localhost:3081/api';
-
-  private rolesSubject = new BehaviorSubject<rolesInterfaz[]>([]);
-  roles$ = this.rolesSubject.asObservable();
-
-  private totalSubject = new BehaviorSubject<number>(0);
-  total$ = this.totalSubject.asObservable();
 
   private http = inject(HttpClient);
 
@@ -58,61 +51,10 @@ export class RolesServicesService {
     );
   }
 
-  list(): Observable<any> {
-    return this.http.get(this.API_ENDPOINT + '/roles', {
-      headers: this._header(),
-    });
-  }
-
-  findOne(id: any): Observable<any> {
-    return this.http.get(this.API_ENDPOINT + '/roles/' + id, {
-      headers: this._header(),
-    }) as Observable<any>;
-  }
-
-  search(query: any): Observable<any> {
-    return this.http.post(this.API_ENDPOINT + '/roles/search', query, {
-      headers: this._header(),
-    });
-  }
-  /*
-  searchList(query: any, component: string): Observable<any> {
-    return this.http
-      .post(this.API_ENDPOINT + '/forms/search', query, {
-        headers: this._header(),
-      })
-      .pipe(
-        map((response: Response) => {
-          if (response['success'] && response['data']) {
-            return response['data'];
-          } else {
-            return [];
-          }
-        })
-      );
-  }*/
-  // Método para traer todos los registros
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(this.API_ENDPOINT);
-  }
-
-
-
   remove(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
       headers: this._header(),
     });
   }
 
-  searchRoles(search: string): Observable<any> {
-    return this.http.get(this.API_ENDPOINT + '/roles_nombre/' + search, {
-      headers: this._header(),
-    });
-  }
-
-  saveFile(formData: FormData): Observable<any> {
-    return this.http.post(this.API_ENDPOINT + '/upload/save/roles', formData, {
-      //headers: this._header()
-    });
-  }
 }
