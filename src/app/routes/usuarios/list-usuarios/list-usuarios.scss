@@ -1,0 +1,43 @@
+@use '../../../../../src/sass/variables' as *;
+@use '../../../../../src/sass/title';
+@use '../../../../../src/sass/mixin' as *;
+@use '../../../../../src/sass/propiedades' as *;
+
+.inputSave,
+.inputUpdate {
+  @include decoration(100%, 14%, small, 50px, 50px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+
+.inputFind {
+  @include decoration(80%, 14%, small, 5px, 5px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+
+input.ng-valid {
+  border: 2px solid green;
+}
+
+input.ng-invalid.ng-touched {
+  border: 2px solid red;
+}
+
+@media screen and (min-width: 0px) and (max-width: 800px) {
+  .inputSave,
+  .inputUpdate {
+    @include decoration(100%, 14%, small, 5px, 5px);
+    input {
+      @include textoMayuscula(uppercase);
+    }
+  }
+  .definicionPrincipal {
+    display: none;
+  }
+  .vistaUsers {
+    width: 100%;
+  }
+}
