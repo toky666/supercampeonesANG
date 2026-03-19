@@ -1,0 +1,26 @@
+@use '../../../../../src/sass/variables' as *;
+@use '../../../../../src/sass/title';
+@use '../../../../../src/sass/mixin' as *;
+@use '../../../../../src/sass/propiedades' as *;
+
+.inputSave,
+.inputUpdate {
+  @include decoration(50%, 14%, small, 50px, 50px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+
+.card-user{
+  display: flex;
+  padding-top: 30px;
+  padding-bottom: 12px;
+  background-color: $colorBlanco;
+}
+.parte1{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  width: 60%;
+}

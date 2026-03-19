@@ -29,6 +29,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
@@ -53,6 +54,7 @@ declare let alertify: any;
     NgClass,
     MatTooltipModule,
     TranslateModule,
+    RouterModule
   ],
   templateUrl: './list-usuarios.html',
   styleUrl: './list-usuarios.scss',

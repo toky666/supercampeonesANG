@@ -1,3 +1,196 @@
 <page-header />
 
-<p>add-usuarios works!</p>
+<mat-card appearance="outlined">
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">thumb_up</mat-icon>
+        {{ 'menu.usuarios.titulo.add' | translate }}
+      </ng-template>
+      <div id="panel-table">
+        <mat-card class="card-table" appearance="outlined">{{
+          'menu.usuarios.titulo.add' | translate
+        }}</mat-card>
+      </div>
+      <mat-card appearance="outlined">
+        <div class="card-user">
+          <div class="parte1">
+            <form [formGroup]="form" (ngSubmit)="f.form.valid && saveData()" #f="ngForm" novalidate>
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.names' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.last_names' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.ci' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.phone' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.email' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.roles' | translate }}</mat-label>
+                <mat-select
+                  name="roles"
+                  formControlName="roles"
+                  (selectionChange)="getDataRoles($event.value)"
+                >
+                  <mat-option @for (selector of selectsRoles; track selector) [value]="selector">
+                    {{ selector.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.password' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="inputSave" appearance="outline">
+                <mat-label for="name">{{ 'menu.usuarios.verificar' | translate }}</mat-label>
+
+                <input
+                  matInput
+                  formControlName="name"
+                  name="name"
+                  [(ngModel)]="dataRoles.name"
+                  autocomplete="off"
+                />
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.roles.error.name' | translate }}</strong></mat-error
+                  >
+                }
+                @if (form.get('name')?.hasError('minlength') && form.get('name')?.touched) {
+                  <mat-error>Minimum 3 characters required</mat-error>
+                }
+              </mat-form-field>
+            </form>
+          </div>
+          <div class="parte2"></div>
+        </div>
+        <div class="modelButtons"></div>
+      </mat-card>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">thumb_up</mat-icon>
+        Second
+      </ng-template>
+      Content 2
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">thumb_up</mat-icon>
+        Third
+      </ng-template>
+
+      Content 3
+    </mat-tab>
+  </mat-tab-group>
+</mat-card>

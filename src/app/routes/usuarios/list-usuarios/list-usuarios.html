@@ -84,7 +84,7 @@
     <div class="vista2">{{ 'menu.roles.table.name' | translate }}</div>
 
     <div class="vista3">
-      <button mat-flat-button class="btnInfo" (click)="openModalSave()">
+      <button mat-flat-button class="btnInfo" [routerLink]="['/usuarios/add-usuarios']">
         <div class="alinearIconsButtonAdd">
           <iconify-icon icon="icon-park-twotone:add-one" width="30" height="30" />
           {{ 'menu.principal.adicionar' | translate }} {{ 'menu.sistema.roles' | translate }}
