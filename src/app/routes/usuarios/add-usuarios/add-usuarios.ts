@@ -29,9 +29,11 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import {MatSelectModule} from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
+import { usersInterfaz } from '../../Interfaces/usersInterfaz';
+
 
 @Component({
   selector: 'app-usuarios-add-usuarios',
@@ -48,13 +50,12 @@ import { MatCardModule } from '@angular/material/card';
     FormsModule,
     MatPaginatorModule,
     MatFormFieldModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
     NgClass,
     MatTooltipModule,
     TranslateModule,
     MatTabsModule,
     MatCardModule,
+    MatSelectModule
   ],
   templateUrl: './add-usuarios.html',
   styleUrl: './add-usuarios.scss',
@@ -63,7 +64,10 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class UsuariosAddUsuarios implements OnInit {
   private translate = inject(TranslateService);
+  private dataServiceRoles = inject(RolesServicesService);
 
+
+  user: usersInterfaz = new usersInterfaz();
   dataRoles: rolesInterfaz = {
     name: '',
   };
@@ -81,9 +85,35 @@ export class UsuariosAddUsuarios implements OnInit {
       }
     });
     this.translate.use('en-US'); // idioma inicial
+    this.SelectListDataRoles();
   }
 
   saveData() {}
 
-  
+  getDataRoles(ide1: any) {
+    this.dataServiceRoles.findOne(ide1._id).subscribe(
+      (data) => {
+        this.user.idrol = data._id;
+        this.user.namerol = data.name;
+        
+        console.log('roles de verdad');
+        console.log(this.user.namerol);
+        console.log(this.user.idrol);
+      },
+      (err) => {
+        console.log(err);
+      },
+    );
+  }
+
+    SelectListDataRoles() {
+    this.dataServiceRoles.list().subscribe(
+      data => {
+        this.selectsRoles = data.rows;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
 }

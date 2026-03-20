@@ -62,4 +62,10 @@ export class RolesServicesService {
       headers: this._header(),
     });
   }
+
+  list(): Observable<any> {
+    return this.http.get(this.API_ENDPOINT + '/roles', {
+      headers: this._header(),
+    });
+  }
 }

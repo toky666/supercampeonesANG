@@ -58,7 +58,6 @@
 
               <mat-form-field class="inputSave" appearance="outline">
                 <mat-label for="name">{{ 'menu.usuarios.ci' | translate }}</mat-label>
-
                 <input
                   matInput
                   formControlName="name"
@@ -120,12 +119,13 @@
                 <mat-label for="name">{{ 'menu.usuarios.roles' | translate }}</mat-label>
                 <mat-select
                   name="roles"
-                  formControlName="roles"
                   (selectionChange)="getDataRoles($event.value)"
                 >
-                  <mat-option @for (selector of selectsRoles; track selector) [value]="selector">
-                    {{ selector.name }}
-                  </mat-option>
+                  @for (selector of selectsRoles; track selector._id) {
+                    <mat-option [value]="selector">
+                      {{ selector.name }}
+                    </mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
 
