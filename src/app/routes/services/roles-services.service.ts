@@ -51,10 +51,15 @@ export class RolesServicesService {
     );
   }
 
+  findOne(id: any): Observable<any> {
+    return this.http.get(this.API_ENDPOINT + '/roles/' + id, {
+      headers: this._header(),
+    }) as Observable<any>;
+  }
+
   remove(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
       headers: this._header(),
     });
   }
-
 }

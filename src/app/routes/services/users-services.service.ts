@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { rolesInterfaz } from '../Interfaces/rolesInterfaz';
+import { usersInterfaz } from '../Interfaces/usersInterfaz';
 @Injectable({
   providedIn: 'root',
 })
 export class UsersServicesService {
-   API_ENDPOINT = 'http://localhost:3081/api';
+  API_ENDPOINT = 'http://localhost:3081/api';
 
   private http = inject(HttpClient);
 
@@ -22,27 +22,27 @@ export class UsersServicesService {
     return headers;
   }
 
-  save(guardar: rolesInterfaz) {
+  save(guardar: usersInterfaz) {
     return this.http.post(
-      this.API_ENDPOINT + '/roles',
+      this.API_ENDPOINT + '/users',
       { data: guardar },
       { headers: this._header() },
     );
   }
 
   dataTablePagination(query: any): Observable<any> {
-    return this.http.post(this.API_ENDPOINT + '/roles/datatable', query, {
+    return this.http.post(this.API_ENDPOINT + '/users/datatable', query, {
       headers: this._header(),
     });
   }
 
   doFilter(query: any): Observable<any> {
-    return this.http.post(this.API_ENDPOINT + '/roles/dofilter', query);
+    return this.http.post(this.API_ENDPOINT + '/users/dofilter', query);
   }
 
   update(id: any, edit: any): Observable<any> {
     return this.http.put(
-      this.API_ENDPOINT + '/roles/' + id,
+      this.API_ENDPOINT + '/users/' + id,
       { data: edit },
       {
         headers: this._header(),
@@ -50,10 +50,15 @@ export class UsersServicesService {
     );
   }
 
+  findOne(id: any): Observable<any> {
+    return this.http.get(this.API_ENDPOINT + '/users/' + id, {
+      headers: this._header(),
+    }) as Observable<any>;
+  }
+
   remove(id: any): Observable<any> {
-    return this.http.delete(this.API_ENDPOINT + '/roles/' + id, {
+    return this.http.delete(this.API_ENDPOINT + '/users/' + id, {
       headers: this._header(),
     });
   }
-
 }

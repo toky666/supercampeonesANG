@@ -63,16 +63,16 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class UsuariosAddUsuarios implements OnInit {
   private translate = inject(TranslateService);
+
   dataRoles: rolesInterfaz = {
     name: '',
   };
+
   form = new FormGroup({
     name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
   });
 
-
-
- selectsRoles!: rolesInterfaz[];
+  selectsRoles!: rolesInterfaz[];
 
   ngOnInit(): void {
     this.form.get('name')?.valueChanges.subscribe((val) => {
@@ -84,4 +84,6 @@ export class UsuariosAddUsuarios implements OnInit {
   }
 
   saveData() {}
+
+  
 }
