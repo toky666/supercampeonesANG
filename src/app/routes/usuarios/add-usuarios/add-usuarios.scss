@@ -3,24 +3,185 @@
 @use '../../../../../src/sass/mixin' as *;
 @use '../../../../../src/sass/propiedades' as *;
 
-.inputSave,
-.inputUpdate {
-  @include decoration(50%, 14%, small, 50px, 50px);
+.fieldInput {
+  @include decoration(100%, 80%, small, 10px, 10px);
   input {
     @include textoMayuscula(uppercase);
   }
 }
 
-.card-user{
+.ciSave {
+  @include decoration(55%, 80%, small, 10px, 10px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+
+.expSave {
+  @include decoration(45%, 80%, small, 10px, 10px);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+}
+.genderInput {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  @include decoration(94%, 94%, small, 0, 0);
+  input {
+    @include textoMayuscula(uppercase);
+  }
+  padding-top: 0;
+  background-color: $colorBlanco;
+  filter: drop-shadow(0 1px 3px $colorAzul);
+  text-align: center;
+  color: $colorNegro;
+  overflow: hidden; /* detrás del texto e íconos */
+}
+
+.selectGender {
+  cursor: pointer;
+  z-index: 30;
+}
+
+.colorcito,
+.colorcito2 {
+  position: relative; /* referencia para el pseudo-elemento */
+  width: 250px; /* ancho del card */
+  border-radius: 16px;
+  background: #f5f5f5; /* color base */
+  overflow: hidden;
+}
+
+/* círculo rojo detrás del contenido */
+.colorcito::before {
+  content: '';
+  position: fixed;
+  top: 60%;
+  left: 2%;
+  width: 158%;
+  height: 216%;
+  background: rgb(0 147 255 / 21%);
+  border-radius: 50%;
+  /* transform: translate(-50%, -50%); */
+  z-index: 10;
+  animation: showCircle 0.8s ease forwards; /* animación al cargar */
+}
+
+/* círculo rojo detrás del contenido */
+.colorcito2::before {
+  content: '';
+  position: fixed;
+  top: 60%;
+  left: 96%;
+  width: 158%;
+  height: 216%;
+  background: rgba(255, 0, 200, 0.21);
+  border-radius: 50%;
+  /* transform: translate(-50%, -50%); */
+  z-index: 10;
+  animation: showCircle 0.8s ease forwards; /* animación al cargar */
+}
+
+@keyframes showCircle {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.iconSex {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  padding-top: 15px;
+}
+
+.card-user {
   display: flex;
   padding-top: 30px;
-  padding-bottom: 12px;
   background-color: $colorBlanco;
+  width: 96%;
+  height: 100%;
+  left: 2%;
+  justify-content: center;
+  right: 2%;
+  filter: drop-shadow(0 0 3px $colorAzul);
 }
-.parte1{
+.parte1 {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 30px;
   padding-bottom: 30px;
   width: 60%;
+}
+.parte2 {
+  width: 40%;
+  display: block;
+  align-items: center;
+  justify-content: center;
+}
+.letter1 {
+  color: $colorVerde;
+}
+.letter2 {
+  color: $colorRojo;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 25% 25% 50%; /* dos columnas de campos + columna foto */
+  grid-template-areas:
+    'names last_names profile-picture'
+    'ci-exp phone profile-picture'
+    'email roles profile-picture'
+    'password verificar profile-picture'
+    'birthday genderInput profile-picture';
+}
+
+.profile-picture {
+  grid-column: 3; /* tercera columna */
+  grid-row: 1 / -1; /* ocupa desde la primera fila hasta la última */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.picture-placeholder {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* una sola columna */
+    grid-template-areas:
+      'nombres'
+      'apellidos'
+      'ci'
+      'expendi'
+      'telefono'
+      'email'
+      'rol'
+      'password'
+      'confirmPassword'
+      'birthday'
+      'gender'
+      'profile';
+  }
+  .profile-picture {
+    grid-column: 1;
+    grid-row: none;
+  }
 }

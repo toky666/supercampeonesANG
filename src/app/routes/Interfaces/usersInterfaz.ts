@@ -3,7 +3,9 @@ export class usersInterfaz {
   names!: string;
   last_names!: string;
   ci!: string;
+  exp!: string;
   phone!: string;
+  birthday!: string;
   password!: string;
   email!: string;
   sex!: string;
