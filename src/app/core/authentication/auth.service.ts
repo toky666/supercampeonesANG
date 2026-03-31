@@ -15,14 +15,14 @@ export class AuthService {
   private user$ = new BehaviorSubject<User>({});
   private change$ = merge(
     this.tokenService.change(),
-    this.tokenService.refresh().pipe(switchMap(() => this.refresh()))
+    this.tokenService.refresh().pipe(switchMap(() => this.refresh())),
   ).pipe(
     switchMap(() => this.assignUser()),
-    share()
+    share(),
   );
 
   init() {
-    return new Promise<void>(resolve => this.change$.subscribe(() => resolve()));
+    return new Promise<void>((resolve) => this.change$.subscribe(() => resolve()));
   }
 
   change() {
@@ -33,10 +33,10 @@ export class AuthService {
     return this.tokenService.valid();
   }
 
-  login(username: string, password: string, rememberMe = false) {
-    return this.loginService.login(username, password, rememberMe).pipe(
-      tap(token => this.tokenService.set(token)),
-      map(() => this.check())
+  login(username: string, password: string) {
+    return this.loginService.login(username, password).pipe(
+      tap((token) => this.tokenService.set(token)),
+      map(() => this.check()),
     );
   }
 
@@ -45,15 +45,15 @@ export class AuthService {
       .refresh(filterObject({ refresh_token: this.tokenService.getRefreshToken() }))
       .pipe(
         catchError(() => of(undefined)),
-        tap(token => this.tokenService.set(token)),
-        map(() => this.check())
+        tap((token) => this.tokenService.set(token)),
+        map(() => this.check()),
       );
   }
 
   logout() {
     return this.loginService.logout().pipe(
       tap(() => this.tokenService.clear()),
-      map(() => !this.check())
+      map(() => !this.check()),
     );
   }
 
@@ -64,16 +64,19 @@ export class AuthService {
   menu() {
     return iif(() => this.check(), this.loginService.menu(), of([]));
   }
+  secretaria() {
+    return iif(() => this.check(), this.loginService.secretaria(), of([]));
+  }
 
   private assignUser() {
     if (!this.check()) {
-      return of({}).pipe(tap(user => this.user$.next(user)));
+      return of({}).pipe(tap((user) => this.user$.next(user)));
     }
 
     if (!isEmptyObject(this.user$.getValue())) {
       return of(this.user$.getValue());
     }
 
-    return this.loginService.user().pipe(tap(user => this.user$.next(user)));
+    return this.loginService.user().pipe(tap((user) => this.user$.next(user)));
   }
 }

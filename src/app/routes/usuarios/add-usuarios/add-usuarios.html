@@ -1,237 +1,263 @@
 <page-header />
 
-<mat-card appearance="outlined">
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">thumb_up</mat-icon>
-        {{ 'menu.usuarios.titulo.add' | translate }}
-      </ng-template>
-      <div id="panel-table">
-        <mat-card class="card-table" appearance="outlined">{{
-          'menu.usuarios.titulo.add' | translate
-        }}</mat-card>
-      </div>
-      <mat-card class="card-user" appearance="outlined">
-        <form
-          class="form-grid"
-          [formGroup]="dataForm"
-          (ngSubmit)="(f.form.valid)"
-          #f="ngForm"
-          novalidate
-        >
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="names">{{ 'menu.usuarios.names' | translate }}</mat-label>
+<mat-stepper #stepper>
+  <mat-step [stepControl]="firstFormGroup">
+    <form [formGroup]="firstFormGroup">
+      <ng-template matStepLabel>Fill out your name</ng-template>
+      <mat-card appearance="outlined">
+        <ng-template mat-tab-label>
+          <mat-icon class="example-tab-icon">thumb_up</mat-icon>
+          {{ 'menu.usuarios.titulo.add' | translate }}
+        </ng-template>
+        <div id="panel-usuario">
+          <mat-card class="card-usuario" appearance="outlined">{{
+            'menu.usuarios.titulo.add' | translate
+          }}</mat-card>
+        </div>
+        <mat-card class="card-user" appearance="outlined">
+          <form
+            class="form-grid"
+            [formGroup]="dataForm"
+            (ngSubmit)="(f.form.valid)"
+            #f="ngForm"
+            novalidate
+          >
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="names">{{ 'menu.usuarios.names' | translate }}</mat-label>
 
-            <input
-              matInput
-              formControlName="names"
-              name="names"
-              [(ngModel)]="user.names"
-              autocomplete="off"
-            />
-            @if (form.get('names')?.hasError('required') && form.get('names')?.touched) {
-              <mat-error
-                ><strong>{{ 'menu.usuarios.error.names' | translate }}</strong></mat-error
-              >
-            }
-          </mat-form-field>
-
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="last_names">{{ 'menu.usuarios.last_names' | translate }}</mat-label>
-
-            <input
-              matInput
-              formControlName="last_names"
-              name="last_names"
-              [(ngModel)]="user.last_names"
-              autocomplete="off"
-            />
-            @if (form.get('last_names')?.hasError('required') && form.get('last_names')?.touched) {
-              <mat-error
-                ><strong>{{ 'menu.usuarios.error.last_names' | translate }}</strong></mat-error
-              >
-            }
-          </mat-form-field>
-
-          <div class="ci-exp">
-            <mat-form-field class="ciSave" appearance="outline">
-              <mat-label for="ci">{{ 'menu.usuarios.ci' | translate }}</mat-label>
-              <input
-                matInput
-                formControlName="ci"
-                name="ci"
-                [(ngModel)]="user.ci"
-                autocomplete="off"
-              />
-              @if (form.get('ci')?.hasError('required') && form.get('ci')?.touched) {
+              <input matInput formControlName="names" name="names" autocomplete="off" />
+              @if (dataForm.get('names')?.hasError('required') && dataForm.get('names')?.touched) {
                 <mat-error
-                  ><strong>{{ 'menu.usuarios.error.ci' | translate }}</strong></mat-error
+                  ><strong>{{ 'menu.usuarios.error.names' | translate }}</strong></mat-error
                 >
               }
             </mat-form-field>
 
-            <mat-form-field class="expSave" appearance="outline">
-              <mat-label for="exp">{{ 'menu.usuarios.exp' | translate }}</mat-label>
-              <mat-select formControlName="exp" name="exp" [(ngModel)]="user.exp">
-                @for (selectExp of selectsExp; track selectExp) {
-                  <mat-option [value]="selectExp.value">
-                    {{ selectExp.viewValue }}
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="last_names">{{ 'menu.usuarios.last_names' | translate }}</mat-label>
+              <input matInput formControlName="last_names" name="last_names" autocomplete="off" />
+              @if (
+                dataForm.get('last_names')?.hasError('required') &&
+                dataForm.get('last_names')?.touched
+              ) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.last_names' | translate }}</strong></mat-error
+                >
+              }
+            </mat-form-field>
+
+            <div class="ci-exp">
+              <mat-form-field class="ciSave" appearance="outline">
+                <mat-label for="ci">{{ 'menu.usuarios.ci' | translate }}</mat-label>
+                <input matInput formControlName="ci" name="ci" autocomplete="off" />
+                @if (dataForm.get('ci')?.hasError('required') && dataForm.get('ci')?.touched) {
+                  <mat-error
+                    ><strong>{{ 'menu.usuarios.error.ci' | translate }}</strong></mat-error
+                  >
+                }
+              </mat-form-field>
+
+              <mat-form-field class="expSave" appearance="outline">
+                <mat-label for="exp">{{ 'menu.usuarios.exp' | translate }}</mat-label>
+                <mat-select formControlName="exp" name="exp">
+                  @for (selectExp of selectsExp; track selectExp) {
+                    <mat-option [value]="selectExp.value">
+                      {{ selectExp.viewValue }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="phone">{{ 'menu.usuarios.phone' | translate }}</mat-label>
+              <input matInput formControlName="phone" name="phone" autocomplete="off" />
+              @if (dataForm.get('phone')?.hasError('required') && dataForm.get('phone')?.touched) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.phone' | translate }}</strong></mat-error
+                >
+              }
+            </mat-form-field>
+
+            <mat-form-field class="fieldEmail" appearance="outline">
+              <mat-label for="email">{{ 'menu.usuarios.email' | translate }}</mat-label>
+
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                name="email"
+                autocomplete="off"
+              />
+              @if (dataForm.get('email')?.hasError('required') && dataForm.get('email')?.touched) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.email' | translate }}</strong></mat-error
+                >
+              }
+            </mat-form-field>
+
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="idrol">{{ 'menu.usuarios.roles' | translate }}</mat-label>
+              <mat-select
+                name="idrol"
+                formControlName="idrol"
+                (selectionChange)="getDataRoles($event.value)"
+              >
+                @for (selector of selectsRoles; track selector._id) {
+                  <mat-option [value]="selector._id">
+                    {{ selector.name }}
                   </mat-option>
                 }
               </mat-select>
-            </mat-form-field>
-          </div>
-
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="phone">{{ 'menu.usuarios.phone' | translate }}</mat-label>
-            <input
-              matInput
-              formControlName="phone"
-              name="phone"
-              [(ngModel)]="user.phone"
-              autocomplete="off"
-            />
-            @if (form.get('phone')?.hasError('required') && form.get('phone')?.touched) {
-              <mat-error
-                ><strong>{{ 'menu.usuarios.error.phone' | translate }}</strong></mat-error
-              >
-            }
-          </mat-form-field>
-
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="email">{{ 'menu.usuarios.email' | translate }}</mat-label>
-
-            <input
-              matInput
-              class="emailInput"
-              type="email"
-              formControlName="email"
-              name="email"
-              [(ngModel)]="user.email"
-              autocomplete="off"
-            />
-            @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
-              <mat-error
-                ><strong>{{ 'menu.usuarios.error.email' | translate }}</strong></mat-error
-              >
-            }
-          </mat-form-field>
-
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="roles">{{ 'menu.usuarios.roles' | translate }}</mat-label>
-            <mat-select
-              name="roles"
-              formControlName="roles"
-              (selectionChange)="getDataRoles($event.value)"
-            >
-              @for (selector of selectsRoles; track selector._id) {
-                <mat-option [value]="selector">
-                  {{ selector.name }}
-                </mat-option>
+              @if (dataForm.get('idrol')?.hasError('required') && dataForm.get('idrol')?.touched) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.roles' | translate }}</strong></mat-error
+                >
               }
-            </mat-select>
-          </mat-form-field>
+            </mat-form-field>
 
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="password">{{ 'menu.usuarios.password' | translate }}</mat-label>
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="password">{{ 'menu.usuarios.password' | translate }}</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="password"
+                name="password"
+                autocomplete="off"
+              />
+              @if (
+                dataForm.get('password')?.hasError('required') && dataForm.get('password')?.touched
+              ) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.password' | translate }}</strong></mat-error
+                >
+              }
+            </mat-form-field>
 
-            <input
-              matInput
-              type="password"
-              formControlName="password"
-              name="password"
-              [(ngModel)]="user.password"
-              autocomplete="off"
-            />
-            @if (form.get('password')?.hasError('required') && form.get('password')?.touched) {
-              <mat-error
-                ><strong>{{ 'menu.usuarios.error.password' | translate }}</strong></mat-error
-              >
-            }
-          </mat-form-field>
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label for="verificar">{{ 'menu.usuarios.verificar' | translate }}</mat-label>
+              <input
+                matInput
+                type="password"
+                name="verificar"
+                autocomplete="off"
+                (keyup)="verificarPassword($event)"
+              />
+              @if (letter === 1) {
+                <mat-hint class="letter1" />
+              } @else if (letter === 2) {
+                <mat-hint class="letter1">
+                  {{ 'menu.usuarios.error.letter1' | translate }}
+                </mat-hint>
+              } @else if (letter === 3) {
+                <mat-hint class="letter2">
+                  {{ 'menu.usuarios.error.letter2' | translate }}
+                </mat-hint>
+              }
+            </mat-form-field>
 
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label for="verificar">{{ 'menu.usuarios.verificar' | translate }}</mat-label>
-            <input
-              matInput
-              type="password"
-              formControlName="verificar"
-              name="verificar"
-              [(ngModel)]="verificar_password"
-              autocomplete="off"
-              (keyup)="verificarPassword()"
-            />
-            @if (letter === 1) {
-              <mat-hint class="letter1" />
-            } @else if (letter === 2) {
-              <mat-hint class="letter1">
-                {{ 'menu.usuarios.error.letter1' | translate }}
-              </mat-hint>
-            } @else if (letter === 3) {
-              <mat-hint class="letter2">
-                {{ 'menu.usuarios.error.letter2' | translate }}
-              </mat-hint>
-            }
-          </mat-form-field>
+            <div class="genderInput">
+              <div class="barraAzul"></div>
+              <div>
+                <mat-label>Por favor seleccione su genero</mat-label>
+              </div>
 
-          <div class="genderInput">
-            <div class="barraAzul"></div>
-            <div>
-              <mat-label>Por favor seleccione su genero</mat-label>
+              <mat-radio-group class="iconSex" formControlName="sex" name="sex" appearance="legacy">
+                <mat-radio-button class="male-option" (click)="selectGender('male')" value="male">
+                  <iconify-icon icon="fluent-emoji-flat:male-sign" width="32" height="32" />
+                </mat-radio-button>
+
+                <mat-radio-button
+                  class="female-option"
+                  (click)="selectGender('female')"
+                  value="female"
+                >
+                  <iconify-icon icon="fluent-emoji-flat:female-sign" width="32" height="32" />
+                </mat-radio-button>
+              </mat-radio-group>
+              @if (optionSex === 1) {
+                <div class="colorcito"></div>
+              } @else if (optionSex === 2) {
+                <div class="colorcito2"></div>
+              }
             </div>
 
-            <mat-button-toggle-group
-              class="iconSex"
-              [(ngModel)]="user.sex"
-              formControlName="sex"
-              name="sex"
-              appearance="legacy"
-            >
-              <mat-button-toggle class="selectGender"(click)="selectGender('male')" value="male">
+            <mat-form-field class="fieldInput" appearance="outline">
+              <mat-label>{{ 'menu.usuarios.date' | translate }}</mat-label>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                formControlName="birthday"
+                name="birthday"
+                (keyup)="verificarFecha()"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="picker" />
+              <mat-datepicker #picker />
+              @if (
+                dataForm.get('birthday')?.hasError('required') && dataForm.get('birthday')?.touched
+              ) {
+                <mat-error
+                  ><strong>{{ 'menu.usuarios.error.date' | translate }}</strong></mat-error
+                >
+              }
+            </mat-form-field>
+
+            <div class="profile-picture">
+              <div class="picture-placeholder">
+                <mat-icon>person</mat-icon>
                 <iconify-icon
-                  icon="fluent-emoji-flat:male-sign"
-                  width="32"
-                  height="32"
+                  icon="f7:photo-fill"
+                  width="250"
+                  height="250"
+                  style="color: #2d67d6"
                 />
-              </mat-button-toggle>
-
-              <mat-button-toggle class="selectGender" (click)="selectGender('female')" value="female">
-                <iconify-icon
-                  icon="fluent-emoji-flat:female-sign"
-                  width="32"
-                  height="32"
-                />
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-            @if (optionSex === 1) {
-              <div class="colorcito"></div>
-            } @else if (optionSex === 2) {
-              <div class="colorcito2"></div>
-            }
-          </div>
-
-          <mat-form-field class="fieldInput" appearance="outline">
-            <mat-label>{{ 'menu.usuarios.date' | translate }}</mat-label>
-            <input
-              matInput
-              [matDatepicker]="picker"
-              formControlName="birthday"
-              name="birthday"
-              [(ngModel)]="user.birthday"
-              (keyup)="verificarFecha()"
-            />
-            <mat-datepicker-toggle matIconSuffix [for]="picker" />
-            <mat-datepicker #picker />
-          </mat-form-field>
-
-          <!-- Columna derecha: foto de perfil -->
-          <div class="profile-picture">
-            <div class="picture-placeholder">
-              <mat-icon>person</mat-icon>
-              <iconify-icon icon="f7:photo-fill" width="250" height="250" style="color: #2d67d6" />
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
 
-        <div class="modelButtons"></div>
+          <div class="modelButtons"></div>
+        </mat-card>
       </mat-card>
-</mat-card>
+      <div>
+        <button matButton matStepperNext>Next</button>
+      </div>
+      <div>
+        <button
+          mat-flat-button
+          type="submit"
+          [disabled]="dataForm.invalid"
+          [ngClass]="dataForm.valid ? 'btnSuccess' : 'btnNeutro'"
+          (click)="saveData()"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="secondFormGroup">
+    <form [formGroup]="secondFormGroup">
+      <ng-template matStepLabel>Fill out your address</ng-template>
+      <mat-form-field>
+        <mat-label>Address</mat-label>
+        <input
+          matInput
+          formControlName="secondCtrl"
+          placeholder="Ex. 1 Main St, New York, NY"
+          required
+        />
+      </mat-form-field>
+      <div>
+        <button matButton matStepperPrevious>Back</button>
+        <button matButton matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+    <p>You are now done.</p>
+    <div>
+      <button matButton matStepperPrevious>Back</button>
+      <button matButton (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-stepper>

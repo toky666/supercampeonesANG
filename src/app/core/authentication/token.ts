@@ -13,7 +13,7 @@ export abstract class BaseToken {
   }
 
   get token_type() {
-    return this.attributes.token_type ?? 'bearer';
+    return this.attributes.token_type ?? 'token';
   }
 
   get exp() {
@@ -52,7 +52,7 @@ export class SimpleToken extends BaseToken {}
 export class JwtToken extends SimpleToken {
   private _payload?: { exp?: number };
 
-  static is(accessToken: string): boolean {
+  /*static is(accessToken: string): boolean {
     try {
       const [_header] = accessToken.split('.');
       const header = JSON.parse(base64.decode(_header));
@@ -61,7 +61,7 @@ export class JwtToken extends SimpleToken {
     } catch (e) {
       return false;
     }
-  }
+  }*/
 
   override get exp() {
     return this.payload?.exp;

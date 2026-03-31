@@ -22,10 +22,10 @@ export class UsersServicesService {
     return headers;
   }
 
-  save(guardar: usersInterfaz) {
+  save(data: usersInterfaz): Observable<any> {
     return this.http.post(
       this.API_ENDPOINT + '/users',
-      { data: guardar },
+      { user: data },
       { headers: this._header() },
     );
   }
@@ -58,6 +58,12 @@ export class UsersServicesService {
 
   remove(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/users/' + id, {
+      headers: this._header(),
+    });
+  }
+
+  findEmail(search: any): Observable<any> {
+    return this.http.get(this.API_ENDPOINT  + '/get_email/' + search, {
       headers: this._header(),
     });
   }

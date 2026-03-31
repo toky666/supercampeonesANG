@@ -51,6 +51,13 @@ export class UserButton {
   user = toSignal(this.auth.user());
 
   logout() {
+   /* console.log('vete1');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('_s');
+    localStorage.removeItem('fecha_inicio');
+    
+    const hora =new Date().toLocaleString();
+    localStorage.setItem('fecha_final', hora);*/
     this.auth.logout().subscribe(() => {
       this.router.navigateByUrl('/auth/login');
     });

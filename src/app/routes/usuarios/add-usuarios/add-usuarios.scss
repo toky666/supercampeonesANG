@@ -4,21 +4,23 @@
 @use '../../../../../src/sass/propiedades' as *;
 
 .fieldInput {
-  @include decoration(100%, 80%, small, 10px, 10px);
+  @include decoration(100%, 100%, small, 10px, 10px);
   input {
     @include textoMayuscula(uppercase);
   }
 }
-
+.fieldEmail{
+  @include decoration(100%, 100%, small, 10px, 10px);
+}
 .ciSave {
-  @include decoration(55%, 80%, small, 10px, 10px);
+  @include decoration(55%, 100%, small, 10px, 10px);
   input {
     @include textoMayuscula(uppercase);
   }
 }
 
 .expSave {
-  @include decoration(45%, 80%, small, 10px, 10px);
+  @include decoration(45%, 100%, small, 10px, 10px);
   input {
     @include textoMayuscula(uppercase);
   }
@@ -39,10 +41,16 @@
   overflow: hidden; /* detrás del texto e íconos */
 }
 
-.selectGender {
+.male-option .female-option {
   cursor: pointer;
-  z-index: 30;
+  z-index: 30 ;
 }
+
+::ng-deep .mat-mdc-radio-button .mdc-radio {
+  display: none !important;
+  z-index: 10;
+}
+
 
 .colorcito,
 .colorcito2 {
@@ -58,7 +66,7 @@
   content: '';
   position: fixed;
   top: 60%;
-  left: 2%;
+  left: -27%;
   width: 158%;
   height: 216%;
   background: rgb(0 147 255 / 21%);
@@ -73,7 +81,7 @@
   content: '';
   position: fixed;
   top: 60%;
-  left: 96%;
+  left: 127%;
   width: 158%;
   height: 216%;
   background: rgba(255, 0, 200, 0.21);
@@ -96,21 +104,46 @@
 
 .iconSex {
   display: flex;
-  gap: 25px;
+  gap: 50px;
   justify-content: center;
   padding-top: 15px;
 }
 
 .card-user {
   display: flex;
-  padding-top: 30px;
+  padding-top: 60px;
   background-color: $colorBlanco;
   width: 96%;
-  height: 100%;
+  height: 555px;
   left: 2%;
   justify-content: center;
   right: 2%;
   filter: drop-shadow(0 0 3px $colorAzul);
+}
+.card-usuario {
+  width: 100%;
+  background-color: $colorAzul;
+  height: 80px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  align-content: flex-start;
+  display: flex !important;
+  color: $colorBlanco;
+  font-size: 20px;
+  font-weight: 500;
+  border: 2px solid $colorAzul;
+  filter: drop-shadow(0 0 12px $colorAzul);
+}
+#panel-usuario {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  padding-left: 5%;
+  padding-right: 5%;
+  margin-bottom: -60px;
+  margin-top: 34px;
+  z-index: 2;
 }
 .parte1 {
   padding-left: 20px;
