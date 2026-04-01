@@ -52,7 +52,7 @@ export class Login {
   isSubmitting = false;
 
   loginForm = this.fb.nonNullable.group({
-    username: ['coronelchavezyoky@gmail.com', [Validators.required]],
+    email: ['coronelchavezyoky@gmail.com', [Validators.required]],
     password: ['12345', [Validators.required]],
   });
 
@@ -61,14 +61,14 @@ export class Login {
     password: new FormControl<string>('12345', { validators: [Validators.required] }),
   });*/
 
-  get username() {
-    return this.loginForm.get('username')!;
+  get email() {
+    return this.loginForm.get('email')!;
   }
 
   get password() {
     return this.loginForm.get('password')!;
   }
-  login() {
+  login3333() {
     this.isSubmitting = true;
     const perm =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWMzMzMwMjM4MGVhZjBhYzRjYzk2MmYiLCJpZHJvbCI6IjY5YTYxN2MwNzM1MjQxNTc4ODI5NzEwMiIsIm5hbWVzIjoiWU9LWSIsImlhdCI6MTc3NDkxNTc5NiwiZXhwIjoxNzc0OTE2Njk2fQ.qfIxsk3loXMGJOw2xwl3oViZu_Hj9b_yAh5vDviHjWc';
@@ -80,7 +80,7 @@ export class Login {
 
     localStorage.setItem('fecha_inicio', hora);
     this.auth
-      .login(this.username.value, this.password.value)
+      .login(this.email.value, this.password.value)
       .pipe(filter((authenticated) => authenticated))
       .subscribe({
         next: () => {
@@ -101,46 +101,72 @@ export class Login {
       });
   }
 
-  loginOriginal() {
+  login() {
     this.isSubmitting = true;
 
-    this.authService
-      .login(this.loginForm.value as emailInterfaz)
-      .pipe(filter((authenticated) => authenticated))
-      .subscribe({
-        next: (data) => {
-          // Si viene como { data: {...} }
-          const user = data.data ?? data;
-          const token = user.token;
-          const image = user.image;
-          const names = user.names;
-          console.log('**********************************');
-          console.log(user);
-          localStorage.setItem('currentUser', JSON.stringify({ token, image, names }));
-          const perm = user.idrol;
-          console.log(user.idrol);
-          const hora = new Date().toLocaleString();
+    this.authService.login(this.loginForm.value as emailInterfaz).subscribe({
+      next: (data) => {
+        // Si viene como { data: {...} }
+        const user = data.data ?? data;
+        const token = user.token;
+        const image = user.image;
+        const names = user.names;
+        console.log('**********************************');
+        console.log(user);
+        localStorage.setItem('currentUser', JSON.stringify({ token, image, names }));
+        // Obtener el objeto currentUser desde localStorage
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')!);
 
-          localStorage.setItem('fecha_inicio', hora);
-          const id = user._id;
-          const idimagen = user.image;
-          localStorage.setItem('_s', perm);
-          console.log('entro login ' + perm);
-          this.router.navigateByUrl('/');
-        },
-        error: (errorRes: HttpErrorResponse) => {
-          if (errorRes.status === 422) {
-            const form = this.loginForm;
-            const errors = errorRes.error.errors;
-            Object.keys(errors).forEach((key) => {
-              form.get(key === 'email' ? 'username' : key)?.setErrors({
-                remote: errors[key][0],
-              });
+        // Verificar que exista y tenga el token
+        if (currentUser && currentUser.token) {
+          // Guardar el token en la clave _s
+          localStorage.setItem('_s', currentUser.token);
+        }
+        const perm = user.idrol;
+        console.log(user.idrol);
+        const hora = new Date().toLocaleString();
+
+        localStorage.setItem('fecha_inicio', hora);
+        const id = user._id;
+        const idimagen = user.image;
+        localStorage.setItem('_t', perm);
+        //localStorage.setItem('_s', token);
+        console.log('entro login ' + currentUser.token);
+        this.auth
+          .login(this.email.value, this.password.value)
+          .pipe(filter((authenticated) => authenticated))
+          .subscribe({
+            next: () => {
+              this.router.navigateByUrl('/');
+            },
+            error: (errorRes: HttpErrorResponse) => {
+              if (errorRes.status === 422) {
+                const form = this.loginForm;
+                const errors = errorRes.error.errors;
+                Object.keys(errors).forEach((key) => {
+                  form.get(key === 'email' ? 'username' : key)?.setErrors({
+                    remote: errors[key][0],
+                  });
+                });
+              }
+              this.isSubmitting = false;
+            },
+          });
+        //this.router.navigateByUrl('/');
+      },
+      error: (errorRes: HttpErrorResponse) => {
+        if (errorRes.status === 422) {
+          const form = this.loginForm;
+          const errors = errorRes.error.errors;
+          Object.keys(errors).forEach((key) => {
+            form.get(key === 'email' ? 'username' : key)?.setErrors({
+              remote: errors[key][0],
             });
-          }
-          this.isSubmitting = false;
-        },
-      });
+          });
+        }
+        this.isSubmitting = false;
+      },
+    });
   }
   login2222() {
     console.log(this.loginForm.value);

@@ -7,18 +7,18 @@
     <mat-card-content>
       <form class="form-field-full" [formGroup]="loginForm">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'username' | translate }}: ng-matero</mat-label>
-          <input matInput placeholder="ng-matero" formControlName="username" required />
-          @if (username.invalid) {
+          <mat-label>{{ 'email' | translate }}: ng-matero</mat-label>
+          <input matInput placeholder="ng-matero" formControlName="email" required />
+          @if (email.invalid) {
             <mat-error>
-              @if (username.errors?.['required']) {
+              @if (email.errors?.['required']) {
                 <span>
                   {{ 'please_enter' | translate }}
                   <strong>ng-matero</strong>
                 </span>
               }
-              @if (username.errors?.['remote']) {
-                <span>{{ username.errors?.['remote'] }}</span>
+              @if (email.errors?.['remote']) {
+                <span>{{ email.errors?.['remote'] }}</span>
               }
             </mat-error>
           }
