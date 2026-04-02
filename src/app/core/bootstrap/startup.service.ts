@@ -25,7 +25,7 @@ export class StartupService {
    * such as permissions and roles.
    */
   load(){
-    const roles = localStorage.getItem('_s');
+    const roles = localStorage.getItem('_t');
     console.log('entro load startup ');
     if (roles === '69a617c07352415788297102') {
       return new Promise<void>((resolve, reject) => {
@@ -42,6 +42,7 @@ export class StartupService {
           });
       });
     } else {
+      
       return new Promise<void>((resolve, reject) => {
         this.authService
           .change()
