@@ -6,6 +6,7 @@ import { Menu, MenuService } from './menu.service';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { UserStateService } from '@src/app/routes/sessions/login/UserStateService';
 
 @Injectable({
   providedIn: 'root',
@@ -19,45 +20,37 @@ export class StartupService {
   private http = inject(HttpClient);
   private menu = inject(MenuService);
   private router = inject(Router);
+  private userStateService = inject(UserStateService);
 
   /**
    * Load the application only after get the menu or other essential informations
    * such as permissions and roles.
    */
-  load(){
-    const roles = localStorage.getItem('_t');
+  load() {
+    const roles = this.userStateService.getIdRol();
     console.log('entro load startup ');
-    if (roles === '69a617c07352415788297102') {
-      return new Promise<void>((resolve, reject) => {
-        this.authService
-          .change()
-          .pipe(
-            tap((user) => this.setPermissions(user)),
-            switchMap(() => this.authService.menu()), // aqui peude direccionar los administradores
-            tap((menu) => this.setMenu(menu)),
-          )
-          .subscribe({
-            next: () => resolve(),
-            error: () => resolve(),
-          });
-      });
-    } else {
-      
-      return new Promise<void>((resolve, reject) => {
-        this.authService
-          .change()
-          .pipe(
-            tap((user) => this.setPermissions(user)),
-            switchMap(() => this.authService.secretaria()), // aqui peude direccionar los administradores
-            tap((menu) => this.setMenu(menu)),
-          )
-          .subscribe({
-            next: () => resolve(),
-            error: () => resolve(),
-          });
-      });
-    }
+    console.log(roles);
+    return new Promise<void>((resolve, reject) => {
+      this.authService
+        .change()
+        .pipe(
+          tap((user) => this.setPermissions(user)),
+          switchMap(() => {
+            if (roles === '69a617c07352415788297102') {
+              return this.authService.menu();
+            } else {
+              return this.authService.secretaria();
+            }
+          }),
+          tap((menu) => this.setMenu(menu)),
+        )
+        .subscribe({
+          next: () => resolve(),
+          error: () => resolve(),
+        });
+    });
   }
+
   load55555(): Promise<any> {
     const roles = localStorage.getItem('_s');
     console.log('entro load startup ');
