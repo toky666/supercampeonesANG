@@ -35,7 +35,7 @@ export abstract class BaseToken {
   }
 
   getRefreshTime() {
-    return timeLeft((this.exp ?? 0) - 5);
+    return timeLeft((this.exp ?? 0) - 60);
   }
 
   private hasAccessToken() {

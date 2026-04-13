@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { emailInterfaz } from '../Interfaces/emailInterfaz';
+import { UserStateService } from '../sessions/login/UserStateService';
 @Injectable({
   providedIn: 'root',
 })
@@ -10,23 +11,27 @@ export class EmailServicesService {
   API_ENDPOINT = 'http://localhost:3081/api';
   private http = inject(HttpClient);
 
-  _token() {
-    const data = localStorage.getItem('currentUser');
-    return data ? (JSON.parse(data)?.token ?? '') : '';
-  }
-
-  _header() {
-    let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-    headers = headers.append('Authorization', 'Token ' + this._token());
-    console.log(headers);
-    return headers;
-  }
+    private userStateService = inject(UserStateService);
+   /* _token() {
+      const user = this.userStateService.getUser(); // obtienes el usuario desde memoria
+      console.log('Usuario completo desde servicios:', user?.token); // verifica el contenido del usuario
+      return user?.token ?? '';
+    }
+  
+    _header() {
+      let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+      const user = this.userStateService.getUser(); // obtienes el usuario desde memoria
+      const token = user?.token ?? ''; // extraes el token
+      headers = headers.append('Authorization', 'Token ' + token);
+      console.log('Headers construidos:', headers);
+      return headers;
+    }*/
 
   sendUser1(guardar: emailInterfaz) {
     return this.http.post(
       this.API_ENDPOINT + '/email/sendmail',
       { data: guardar },
-      { headers: this._header() },
+      { withCredentials: true  },
     );
   }
 
@@ -40,7 +45,7 @@ export class EmailServicesService {
         }, 
       },
       {
-        headers: this._header(),
+        withCredentials: true  ,
       },
     );
   }
@@ -49,7 +54,7 @@ export class EmailServicesService {
     return this.http.post(
       this.API_ENDPOINT + '/email/sendcontrasena',
       { data: guardar },
-      { headers: this._header() },
+      { withCredentials: true  },
     );
   }
 }

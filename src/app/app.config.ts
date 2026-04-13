@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 import {
   ApplicationConfig,
   importProvidersFrom,
@@ -20,7 +20,7 @@ import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideHotToastConfig } from '@ngxpert/hot-toast';
 import { NgxPermissionsModule } from 'ngx-permissions';
-
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import {
   BASE_URL,
   interceptors,
@@ -34,27 +34,34 @@ import { routes } from './app.routes';
 
 import { LoginService } from '@core/authentication/login.service';
 import { FakeLoginService } from './fake-login.service';
+import { AutoReloadService } from './shared/auto-reload.service';
+import { authInterceptor } from './core/interceptors/authInterceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(
+      withXsrfConfiguration({
+        cookieName: 'XSRF-TOKEN',
+        headerName: 'X-XSRF-TOKEN',
+      }),
+    ),
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     { provide: BASE_URL, useValue: environment.baseUrl },
     provideAppInitializer(() => inject(TranslateLangService).load()),
     provideAppInitializer(() => inject(StartupService).load()),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideHttpClient(withInterceptors(interceptors)),
     provideRouter(
       routes,
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
-      withComponentInputBinding()
+      withComponentInputBinding(),
     ),
     provideHotToastConfig(),
     provideTranslateService({
       loader: provideTranslateHttpLoader({ prefix: 'i18n/', suffix: '.json' }),
     }),
-    importProvidersFrom(
-      NgxPermissionsModule.forRoot(),
-    ),
+    importProvidersFrom(NgxPermissionsModule.forRoot()),
     // ==================================================
     // 👇 ❌ Remove it in the realworld application
     //

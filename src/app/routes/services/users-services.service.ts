@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { usersInterfaz } from '../Interfaces/usersInterfaz';
+import { UserStateService } from '../sessions/login/UserStateService';
 @Injectable({
   providedIn: 'root',
 })
@@ -10,29 +11,29 @@ export class UsersServicesService {
 
   private http = inject(HttpClient);
 
-  _token() {
-    const user = localStorage.getItem('currentUser');
-    return user ? (JSON.parse(user)?.token ?? '') : '';
-  }
-
-  _header() {
-    let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-    headers = headers.append('Authorization', 'Token ' + this._token());
-    console.log(headers);
-    return headers;
-  }
+  private userStateService = inject(UserStateService);
+  /*_token() {
+      const user = this.userStateService.getUser(); // obtienes el usuario desde memoria
+      console.log('Usuario completo desde servicios:', user?.token); // verifica el contenido del usuario
+      return user?.token ?? '';
+    }
+  
+    _header() {
+      let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+      const user = this.userStateService.getUser(); // obtienes el usuario desde memoria
+      const token = user?.token ?? ''; // extraes el token
+      headers = headers.append('Authorization', 'Token ' + token);
+      console.log('Headers construidos:', headers);
+      return headers;
+    }*/
 
   save(data: usersInterfaz): Observable<any> {
-    return this.http.post(
-      this.API_ENDPOINT + '/users',
-      { user: data },
-      { headers: this._header() },
-    );
+    return this.http.post(this.API_ENDPOINT + '/users', { user: data }, { withCredentials: true });
   }
 
   dataTablePagination(query: any): Observable<any> {
     return this.http.post(this.API_ENDPOINT + '/users/datatable', query, {
-      headers: this._header(),
+      withCredentials: true,
     });
   }
 
@@ -45,26 +46,26 @@ export class UsersServicesService {
       this.API_ENDPOINT + '/users/' + id,
       { data: edit },
       {
-        headers: this._header(),
+        withCredentials: true,
       },
     );
   }
 
   findOne(id: any): Observable<any> {
     return this.http.get(this.API_ENDPOINT + '/users/' + id, {
-      headers: this._header(),
+      withCredentials: true,
     }) as Observable<any>;
   }
 
   remove(id: any): Observable<any> {
     return this.http.delete(this.API_ENDPOINT + '/users/' + id, {
-      headers: this._header(),
+      withCredentials: true,
     });
   }
 
   findEmail(search: any): Observable<any> {
-    return this.http.get(this.API_ENDPOINT  + '/get_email/' + search, {
-      headers: this._header(),
+    return this.http.get(this.API_ENDPOINT + '/get_email/' + search, {
+      withCredentials: true,
     });
   }
 }

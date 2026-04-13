@@ -23,6 +23,11 @@ import { AuthServicesService } from '../../services/auth-services.service';
 import { emailInterfaz } from '../../Interfaces/emailInterfaz';
 import { StartupService } from '@src/app/core';
 import { UserStateService } from './UserStateService';
+import { UsersServicesService } from '../../services/users-services.service';
+import { MeServicesService } from '../../services/me-services.service';
+import { UserData } from '../../Interfaces/userData';
+import { BehaviorSubject } from 'rxjs';
+import { AutoReloadService } from '@src/app/shared/auto-reload.service';
 
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
@@ -52,6 +57,12 @@ export class Login {
   private _token = inject(TokenService);
   private _router = inject(Router);
   private userStateService = inject(UserStateService);
+  private dataService = inject(UsersServicesService);
+
+  private meService = inject(MeServicesService);
+   private autoReloadService = inject(AutoReloadService);
+  private userSubject = new BehaviorSubject<UserData | null>(null);
+  user$ = this.userSubject.asObservable();
 
   isSubmitting = false;
 
@@ -60,11 +71,6 @@ export class Login {
     password: ['12345', [Validators.required]],
   });
 
-  /*loginForm = new FormGroup({
-    email: new FormControl<string>('y@gmail.com', { validators: [Validators.required] }),
-    password: new FormControl<string>('12345', { validators: [Validators.required] }),
-  });*/
-
   get email() {
     return this.loginForm.get('email')!;
   }
@@ -72,40 +78,41 @@ export class Login {
   get password() {
     return this.loginForm.get('password')!;
   }
-  login3333() {
-    this.isSubmitting = true;
-    const perm =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWMzMzMwMjM4MGVhZjBhYzRjYzk2MmYiLCJpZHJvbCI6IjY5YTYxN2MwNzM1MjQxNTc4ODI5NzEwMiIsIm5hbWVzIjoiWU9LWSIsImlhdCI6MTc3NDkxNTc5NiwiZXhwIjoxNzc0OTE2Njk2fQ.qfIxsk3loXMGJOw2xwl3oViZu_Hj9b_yAh5vDviHjWc';
-    localStorage.setItem('_s', perm);
-    console.log('entro login');
-    console.log(perm);
-    // localStorage.setItem('currentUser', JSON.stringify({ token, image, names }));
-    const hora = new Date().toLocaleString();
-
-    localStorage.setItem('fecha_inicio', hora);
-    this.auth
-      .login(this.email.value, this.password.value)
-      .pipe(filter((authenticated) => authenticated))
-      .subscribe({
-        next: () => {
-          this.router.navigateByUrl('/');
-        },
-        error: (errorRes: HttpErrorResponse) => {
-          if (errorRes.status === 422) {
-            const form = this.loginForm;
-            const errors = errorRes.error.errors;
-            Object.keys(errors).forEach((key) => {
-              form.get(key === 'email' ? 'username' : key)?.setErrors({
-                remote: errors[key][0],
+  login() {
+    this.authService.login(this.loginForm.value as emailInterfaz).subscribe({
+      next: (resp) => {
+        this.meService.findMe().subscribe({
+          next: (user) => {
+            console.log('Datos recibidos desde backend /me:', user);
+            this.userSubject.next(user);
+            localStorage.setItem('fecha_inicio', new Date().toISOString());
+            this.autoReloadService.startWatching();
+            this._startup.load();
+            this.auth
+              .login(this.email.value, this.password.value)
+              .pipe(filter((authenticated) => authenticated))
+              .subscribe({
+                next: () => {
+                  this.router.navigateByUrl('/');
+                },
+                error: () => {
+                  console.log('mal login');
+                },
               });
-            });
-          }
-          this.isSubmitting = false;
-        },
-      });
+          },
+          error: (err) => {
+            console.error('Error al recuperar usuario desde /me:', err);
+            this.router.navigateByUrl('/auth/login');
+          },
+        });
+      },
+      error: (err) => {
+        console.error('Error en login:', err);
+      },
+    });
   }
 
-  login() {
+  /*login() {
     this.authService.login(this.loginForm.value as emailInterfaz).subscribe({
       next: (data) => {
         const user = data.data ?? data;
@@ -117,25 +124,29 @@ export class Login {
         if (currentUser && currentUser.token) {
           localStorage.setItem('_s', currentUser.token);
         }
-        const perm = user.idrol;
-        console.log(user.idrol);
+
         const hora = new Date().toLocaleString();
         localStorage.setItem('fecha_inicio', hora);
-        const id = user._id;
-        const idimagen = user.image;
-        localStorage.setItem('_t', perm);
-        this.userStateService.setIdRol(user.idrol);
-        //localStorage.setItem('_s', token);
         console.log('entro login ' + currentUser.token);
+
+        // 👉 Guardar el usuario completo en el UserStateService
+        this.userStateService.setUser({
+          _id: user._id,
+          names: user.names,
+          idrol: user.idrol,
+          token: user.token,
+          refreshToken: user.refreshToken
+        });
+
+        console.log('Usuario guardado en memoria:', this.userStateService.getUser());
+
         this._startup.load();
         this.auth
           .login(this.email.value, this.password.value)
           .pipe(filter((authenticated) => authenticated))
           .subscribe({
             next: () => {
-              
               this.router.navigateByUrl('/');
-               //this._startup.load();
             },
             error: () => {
               console.log('mal login');
@@ -146,42 +157,5 @@ export class Login {
         alertify.error('Correo o contraseña incorrectos');
       },
     });
-  }
-  login2222() {
-    console.log(this.loginForm.value);
-    this.authService.login(this.loginForm.value as emailInterfaz).subscribe(
-      (result) => {
-        const data = result?.data;
-        console.log('**********************************');
-        console.log(data);
-        const token = data.token;
-        const image = data.image;
-        const names = data.names;
-        console.log('**********************************');
-        console.log(data);
-        localStorage.setItem('currentUser', JSON.stringify({ token, image, names }));
-        const perm = data.idrol;
-        const hora = new Date().toLocaleString();
-
-        localStorage.setItem('fecha_inicio', hora);
-        const id = data._id;
-        const idimagen = data.image;
-        localStorage.setItem('_s', perm);
-        this._startup.load55555().then(() => {
-          let url = (this._token as any).referrer?.url || '/';
-          console.log('obteniendo el url');
-          console.log(url);
-          if (url.includes('/auth')) {
-            url = '/';
-            console.log('entro if ' + url);
-            console.log(url);
-          }
-          this._router.navigateByUrl('/');
-        });
-      },
-      (err) => {
-        console.log('mal');
-      },
-    );
-  }
+  }*/
 }

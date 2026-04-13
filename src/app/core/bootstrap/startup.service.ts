@@ -1,12 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService, User } from '@core/authentication';
 import { NgxPermissionsService, NgxRolesService } from 'ngx-permissions';
-import { catchError, switchMap, tap, throwError } from 'rxjs';
+import { catchError, of, switchMap, tap, throwError } from 'rxjs';
 import { Menu, MenuService } from './menu.service';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserStateService } from '@src/app/routes/sessions/login/UserStateService';
+import { MeServicesService } from '@src/app/routes/services/me-services.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,28 +22,31 @@ export class StartupService {
   private menu = inject(MenuService);
   private router = inject(Router);
   private userStateService = inject(UserStateService);
+  private meServices = inject(MeServicesService);
 
   /**
    * Load the application only after get the menu or other essential informations
    * such as permissions and roles.
    */
-  load() {
-    const roles = this.userStateService.getIdRol();
-    console.log('entro load startup ');
-    console.log(roles);
-    return new Promise<void>((resolve, reject) => {
-      this.authService
-        .change()
+  load2222() {
+    console.log('Usuario guardado en memoria entro load startup:', this.userStateService.getUser());
+    return new Promise<void>((resolve) => {
+      this.userStateService.user$
         .pipe(
-          tap((user) => this.setPermissions(user)),
-          switchMap(() => {
-            if (roles === '69a617c07352415788297102') {
-              return this.authService.menu();
-            } else {
-              return this.authService.secretaria();
-            }
+          switchMap((roles) => {
+            console.log('roles desde idRol$', roles);
+            return this.authService.change().pipe(
+              tap((user) => this.setPermissions(user)),
+              switchMap(() => {
+                if (roles?.idrol === '69a617c07352415788297102') {
+                  return this.authService.menu();
+                } else {
+                  return this.authService.secretaria();
+                }
+              }),
+              tap((menu) => this.setMenu(menu)),
+            );
           }),
-          tap((menu) => this.setMenu(menu)),
         )
         .subscribe({
           next: () => resolve(),
@@ -50,33 +54,38 @@ export class StartupService {
         });
     });
   }
-
-  load55555(): Promise<any> {
-    const roles = localStorage.getItem('_s');
-    console.log('entro load startup ');
-    if (roles == '69a617c07352415788297102') {
-      return new Promise((resolve, reject) => {
-        this.http
-          .get('public/data/menu.json?_t=' + Date.now())
-          .pipe(
-            catchError((res) => {
-              resolve(null);
-              return throwError(() => res);
-            }),
-          )
-          .subscribe(
-            (res: any) => {
-              this.menu.addNamespace(res.menu, 'menu');
-              this.menu.set(res.menu);
-            },
-            () => reject(),
-            () => resolve(null),
-          );
-      });
-    } else {
-      console.log('ninguno');
-      return Promise.resolve(null); // <-- aquí devuelves algo
-    }
+  load() {
+    console.log('Iniciando validación de rol desde cookie...');
+    return new Promise<void>((resolve) => {
+      this.meServices
+        .findMe() // 👈 hace GET /me con withCredentials
+        .pipe(
+          tap((user) => {
+            console.log('Usuario recuperado desde /me:', user);
+            this.setPermissions(user); // asigna permisos
+          }),
+          switchMap((user) => {
+            // 👉 aquí comparas el idrol directamente
+            if (user?.idrol === '69a617c07352415788297102') {
+              return this.authService.menu();
+            } else {
+              if (user?.idrol === '69cedb603cbbe30840c133d3') {
+                return this.authService.secretaria();
+              } else {
+                this.router.navigateByUrl('/auth/login');
+                return of([]);
+              }
+            }
+          }),
+          tap((menu) => {
+            this.setMenu(menu); // carga menú según rol
+          }),
+        )
+        .subscribe({
+          next: () => resolve(),
+          error: () => resolve(),
+        });
+    });
   }
 
   private setMenu(menu: Menu[]) {

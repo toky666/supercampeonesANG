@@ -6,6 +6,7 @@ import { currentTimestamp, filterObject } from './helpers';
 import { Token } from './interface';
 import { BaseToken } from './token';
 import { TokenFactory } from './token-factory.service';
+import { UserStateService } from '@src/app/routes/sessions/login/UserStateService';
 
 @Injectable({
   providedIn: 'root',
@@ -20,15 +21,14 @@ export class TokenService implements OnDestroy {
   private readonly refresh$ = new Subject<BaseToken | undefined>();
 
   private timer$?: Subscription;
-
   private _token?: BaseToken;
-
+  //private userStateService = inject(UserStateService);
   private get token(): BaseToken | undefined {
+    // console.log('Usuario guardado en memoria entro load startup:', this.userStateService.getUser());
     if (!this._token) {
       this._token = this.factory.create(this.store.get(this.key));
       console.log('token', this._token);
     }
-
     return this._token;
   }
 
@@ -88,7 +88,7 @@ export class TokenService implements OnDestroy {
     this.clearRefresh();
 
     if (this.token?.needRefresh()) {
-      this.timer$ = timer(this.token.getRefreshTime() * 1000).subscribe(() => {
+      this.timer$ = timer(1 * 60 * 1000).subscribe(() => {
         this.refresh$.next(this.token);
       });
     }

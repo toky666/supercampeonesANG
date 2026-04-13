@@ -7,6 +7,7 @@ import { SimpleToken, JwtToken, BaseToken } from './token';
 })
 export class TokenFactory {
   create(attributes: Token): BaseToken | undefined {
+    console.log('TokenFactory create called with attributes:', attributes);
     if (!attributes.access_token) {
       return undefined;
     }
