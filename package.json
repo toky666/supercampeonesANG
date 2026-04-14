@@ -52,6 +52,7 @@
     "ng-matero": "^21.0.0",
     "ngx-permissions": "^19.0.0",
     "ngx-progressbar": "^14.0.0",
+    "ngx-webcam": "^0.4.1",
     "photoviewer": "^3.11.1",
     "rxjs": "~7.8.0",
     "screenfull": "^6.0.2",

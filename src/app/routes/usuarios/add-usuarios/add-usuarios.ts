@@ -41,7 +41,8 @@ import { UsersServicesService } from '../../services/users-services.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { EmailServicesService } from '../../services/email-services.service';
 import { emailInterfaz } from '../../Interfaces/emailInterfaz';
-
+import { WebcamImage, WebcamInitError, WebcamModule, WebcamUtil } from 'ngx-webcam';
+import { Observable, Subject } from 'rxjs';
 //PARA LLAMAR JAVASCRIPT/////
 declare let alertify: any;
 interface selectsExp {
@@ -72,6 +73,7 @@ interface selectsExp {
     MatRadioModule,
     MatStepperModule,
     MatButtonToggleModule,
+    WebcamModule,
   ],
   templateUrl: './add-usuarios.html',
   styleUrl: './add-usuarios.scss',
@@ -107,6 +109,19 @@ export class UsuariosAddUsuarios implements OnInit {
   dataRoles: rolesInterfaz = {
     name: '',
   };
+
+  // toggle webcam on/off
+  public showWebcam = false;
+  public allowCameraSwitch = true;
+  public multipleWebcamsAvailable = false;
+  public deviceId?: string;
+  public facingMode = 'environment';
+  public errors: WebcamInitError[] = [];
+  public webcamImage?: WebcamImage;
+  // webcam snapshot trigger
+  private trigger: Subject<void> = new Subject<void>();
+  // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
+  private nextWebcam: Subject<boolean | string> = new Subject<boolean | string>();
 
   form = new FormGroup({
     name: new FormControl<string>('', { validators: [Validators.required] }), // ahora es siempre string
@@ -162,7 +177,8 @@ export class UsuariosAddUsuarios implements OnInit {
     property: new FormControl<string>('', { validators: [Validators.required] }),
     time: new FormControl<string>('', { validators: [Validators.required] }),*/
   });
-
+  @ViewChild('dialogCamera') dialogCamera!: TemplateRef<any>;
+  private dialog = inject(MatDialog);
   selectsRoles!: rolesInterfaz[];
   listaAddress!: dataAddress[];
   selects3!: usersInterfaz[];
@@ -171,7 +187,6 @@ export class UsuariosAddUsuarios implements OnInit {
   verificar_password: any;
   letter = 1;
   optionSex = 0;
-
   ngOnInit(): void {
     this.form.get('name')?.valueChanges.subscribe((val) => {
       if (val) {
@@ -181,6 +196,10 @@ export class UsuariosAddUsuarios implements OnInit {
 
     this.translate.use('en-US'); // idioma inicial
     this.SelectListDataRoles();
+
+    WebcamUtil.getAvailableVideoInputs().then((mediaDevices: MediaDeviceInfo[]) => {
+      this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
+    });
   }
   prueba(ide: any) {
     this.user.exp = ide;
@@ -283,5 +302,97 @@ export class UsuariosAddUsuarios implements OnInit {
     } else {
       alertify.warning('El password no coincide');
     }
+  }
+
+  openModalCamera() {
+    this.toggleWebcam();
+
+    setTimeout(() => {
+      this.dialog.open(this.dialogCamera, {
+        width: '900px',
+        height: '250px',
+        disableClose: true,
+        panelClass: 'square-dialog',
+      });
+    }, 0); // ✅ espera un tick del event loop
+  }
+
+  imageChangedEvent: any = '';
+  file_upload: File[] = [];
+  url_file: any;
+  croppedImage = '';
+  closedModalPhoto() {
+    this.dialog.closeAll();
+  }
+  onFileChangedUserPhoto(event: any) {
+    this.imageChangedEvent = event;
+    if (event.target.files && event.target.files[0]) {
+      this.file_upload = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]); // read file as data url
+      reader.onload = (event) => {
+        // ✅ Fix 4: verificar que event.target no sea null
+        if (event.target) {
+          this.url_file = event.target['result'];
+          this.croppedImage = this.url_file;
+          console.log(this.croppedImage);
+          console.log('foto de perfil');
+        }
+      };
+    }
+  }
+  public triggerSnapshot(): void {
+    this.trigger.next();
+  }
+
+  public toggleWebcam(): void {
+    this.showWebcam = !this.showWebcam;
+  }
+
+  public handleInitError(error: WebcamInitError): void {
+    if (error.mediaStreamError && error.mediaStreamError.name === 'NotAllowedError') {
+      console.warn('Camera access was not allowed by user!');
+    }
+    this.errors.push(error);
+  }
+
+  public showNextWebcam(directionOrDeviceId: boolean | string): void {
+    // true => move forward through devices
+    // false => move backwards through devices
+    // string => move to device with given deviceId
+    this.nextWebcam.next(directionOrDeviceId);
+  }
+
+  public handleImageUserPhoto(webcamImage: WebcamImage): void {
+    console.log('received webcam image', webcamImage);
+    this.webcamImage = webcamImage;
+    // this.webcamImageLight = webcamImage;
+    // this.webcamImageWater = webcamImage;
+
+    this.url_file = this.webcamImage.imageAsDataUrl;
+    // this.url_file1 = this.webcamImageLight.imageAsDataUrl;
+    // this.url_file2 = this.webcamImageWater.imageAsDataUrl;
+  }
+
+  public cameraWasSwitched(deviceId: string): void {
+    console.log('active device: ' + deviceId);
+    this.deviceId = deviceId;
+  }
+
+  public get triggerObservable(): Observable<void> {
+    return this.trigger.asObservable();
+  }
+
+  public get nextWebcamObservable(): Observable<boolean | string> {
+    return this.nextWebcam.asObservable();
+  }
+
+  public get videoOptions(): MediaTrackConstraints {
+    const result: MediaTrackConstraints = {};
+    if (this.facingMode && this.facingMode !== '') {
+      result.facingMode = { ideal: this.facingMode };
+    }
+
+    return result;
   }
 }

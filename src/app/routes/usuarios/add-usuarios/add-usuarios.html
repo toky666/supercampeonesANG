@@ -12,24 +12,17 @@
         <div id="panel-usuario">
           <mat-card class="card-usuario" appearance="outlined">{{
             'menu.usuarios.titulo.add' | translate
-          }}</mat-card>
+            }}</mat-card>
         </div>
         <mat-card class="card-user" appearance="outlined">
-          <form
-            class="form-grid"
-            [formGroup]="dataForm"
-            (ngSubmit)="(f.form.valid)"
-            #f="ngForm"
-            novalidate
-          >
+          <form class="form-grid" [formGroup]="dataForm" (ngSubmit)="(f.form.valid)" #f="ngForm"
+            novalidate>
             <mat-form-field class="fieldInput" appearance="outline">
               <mat-label for="names">{{ 'menu.usuarios.names' | translate }}</mat-label>
 
               <input matInput formControlName="names" name="names" autocomplete="off" />
               @if (dataForm.get('names')?.hasError('required') && dataForm.get('names')?.touched) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.names' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.names' | translate }}</strong></mat-error>
               }
             </mat-form-field>
 
@@ -37,12 +30,11 @@
               <mat-label for="last_names">{{ 'menu.usuarios.last_names' | translate }}</mat-label>
               <input matInput formControlName="last_names" name="last_names" autocomplete="off" />
               @if (
-                dataForm.get('last_names')?.hasError('required') &&
-                dataForm.get('last_names')?.touched
+              dataForm.get('last_names')?.hasError('required') &&
+              dataForm.get('last_names')?.touched
               ) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.last_names' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.last_names' | translate
+                  }}</strong></mat-error>
               }
             </mat-form-field>
 
@@ -51,9 +43,7 @@
                 <mat-label for="ci">{{ 'menu.usuarios.ci' | translate }}</mat-label>
                 <input matInput formControlName="ci" name="ci" autocomplete="off" />
                 @if (dataForm.get('ci')?.hasError('required') && dataForm.get('ci')?.touched) {
-                  <mat-error
-                    ><strong>{{ 'menu.usuarios.error.ci' | translate }}</strong></mat-error
-                  >
+                <mat-error><strong>{{ 'menu.usuarios.error.ci' | translate }}</strong></mat-error>
                 }
               </mat-form-field>
 
@@ -61,9 +51,9 @@
                 <mat-label for="exp">{{ 'menu.usuarios.exp' | translate }}</mat-label>
                 <mat-select formControlName="exp" name="exp">
                   @for (selectExp of selectsExp; track selectExp) {
-                    <mat-option [value]="selectExp.value">
-                      {{ selectExp.viewValue }}
-                    </mat-option>
+                  <mat-option [value]="selectExp.value">
+                    {{ selectExp.viewValue }}
+                  </mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -73,86 +63,61 @@
               <mat-label for="phone">{{ 'menu.usuarios.phone' | translate }}</mat-label>
               <input matInput formControlName="phone" name="phone" autocomplete="off" />
               @if (dataForm.get('phone')?.hasError('required') && dataForm.get('phone')?.touched) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.phone' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.phone' | translate }}</strong></mat-error>
               }
             </mat-form-field>
 
             <mat-form-field class="fieldEmail" appearance="outline">
               <mat-label for="email">{{ 'menu.usuarios.email' | translate }}</mat-label>
 
-              <input
-                matInput
-                type="email"
-                formControlName="email"
-                name="email"
-                autocomplete="off"
-              />
+              <input matInput type="email" formControlName="email" name="email"
+                autocomplete="off" />
               @if (dataForm.get('email')?.hasError('required') && dataForm.get('email')?.touched) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.email' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.email' | translate }}</strong></mat-error>
               }
             </mat-form-field>
 
             <mat-form-field class="fieldInput" appearance="outline">
               <mat-label for="idrol">{{ 'menu.usuarios.roles' | translate }}</mat-label>
-              <mat-select
-                name="idrol"
-                formControlName="idrol"
-                (selectionChange)="getDataRoles($event.value)"
-              >
+              <mat-select name="idrol" formControlName="idrol"
+                (selectionChange)="getDataRoles($event.value)">
                 @for (selector of selectsRoles; track selector._id) {
-                  <mat-option [value]="selector._id">
-                    {{ selector.name }}
-                  </mat-option>
+                <mat-option [value]="selector._id">
+                  {{ selector.name }}
+                </mat-option>
                 }
               </mat-select>
               @if (dataForm.get('idrol')?.hasError('required') && dataForm.get('idrol')?.touched) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.roles' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.roles' | translate }}</strong></mat-error>
               }
             </mat-form-field>
 
             <mat-form-field class="fieldInput" appearance="outline">
               <mat-label for="password">{{ 'menu.usuarios.password' | translate }}</mat-label>
-              <input
-                matInput
-                type="password"
-                formControlName="password"
-                name="password"
-                autocomplete="off"
-              />
+              <input matInput type="password" formControlName="password" name="password"
+                autocomplete="off" />
               @if (
-                dataForm.get('password')?.hasError('required') && dataForm.get('password')?.touched
+              dataForm.get('password')?.hasError('required') && dataForm.get('password')?.touched
               ) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.password' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.password' | translate
+                  }}</strong></mat-error>
               }
             </mat-form-field>
 
             <mat-form-field class="fieldInput" appearance="outline">
               <mat-label for="verificar">{{ 'menu.usuarios.verificar' | translate }}</mat-label>
-              <input
-                matInput
-                type="password"
-                name="verificar"
-                autocomplete="off"
-                (keyup)="verificarPassword($event)"
-              />
+              <input matInput type="password" name="verificar" autocomplete="off"
+                (keyup)="verificarPassword($event)" />
               @if (letter === 1) {
-                <mat-hint class="letter1" />
+              <mat-hint class="letter1" />
               } @else if (letter === 2) {
-                <mat-hint class="letter1">
-                  {{ 'menu.usuarios.error.letter1' | translate }}
-                </mat-hint>
+              <mat-hint class="letter1">
+                {{ 'menu.usuarios.error.letter1' | translate }}
+              </mat-hint>
               } @else if (letter === 3) {
-                <mat-hint class="letter2">
-                  {{ 'menu.usuarios.error.letter2' | translate }}
-                </mat-hint>
+              <mat-hint class="letter2">
+                {{ 'menu.usuarios.error.letter2' | translate }}
+              </mat-hint>
               }
             </mat-form-field>
 
@@ -167,50 +132,66 @@
                   <iconify-icon icon="fluent-emoji-flat:male-sign" width="32" height="32" />
                 </mat-radio-button>
 
-                <mat-radio-button
-                  class="female-option"
-                  (click)="selectGender('female')"
-                  value="female"
-                >
+                <mat-radio-button class="female-option" (click)="selectGender('female')"
+                  value="female">
                   <iconify-icon icon="fluent-emoji-flat:female-sign" width="32" height="32" />
                 </mat-radio-button>
               </mat-radio-group>
               @if (optionSex === 1) {
-                <div class="colorcito"></div>
+              <div class="colorcito"></div>
               } @else if (optionSex === 2) {
-                <div class="colorcito2"></div>
+              <div class="colorcito2"></div>
               }
             </div>
 
             <mat-form-field class="fieldInput" appearance="outline">
               <mat-label>{{ 'menu.usuarios.date' | translate }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="picker"
-                formControlName="birthday"
-                name="birthday"
-                (keyup)="verificarFecha()"
-              />
+              <input matInput [matDatepicker]="picker" formControlName="birthday" name="birthday"
+                (keyup)="verificarFecha()" />
               <mat-datepicker-toggle matIconSuffix [for]="picker" />
               <mat-datepicker #picker />
               @if (
-                dataForm.get('birthday')?.hasError('required') && dataForm.get('birthday')?.touched
+              dataForm.get('birthday')?.hasError('required') && dataForm.get('birthday')?.touched
               ) {
-                <mat-error
-                  ><strong>{{ 'menu.usuarios.error.date' | translate }}</strong></mat-error
-                >
+              <mat-error><strong>{{ 'menu.usuarios.error.date' | translate }}</strong></mat-error>
               }
             </mat-form-field>
 
             <div class="profile-picture">
               <div class="picture-placeholder">
-                <mat-icon>person</mat-icon>
-                <iconify-icon
-                  icon="f7:photo-fill"
-                  width="250"
-                  height="250"
-                  style="color: #2d67d6"
-                />
+                <div class="seccionPhoto1">
+                  <h5>{{ 'menu.usuarios.camera' | translate }}</h5>
+                </div>
+
+                <div class="seccionPhoto2">
+                  <div class="iconoCamera">
+                    <button mat-icon-button (click)="openModalCamera()" class="icon10">
+                      <span class="material-icons"> camera_alt </span>
+                    </button>
+                    <button mat-icon-button (click)="userPhoto.click()" class="icon10">
+                      <span class="material-icons"> folder </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="seccionPhoto3">
+                  <div style="text-align: center">
+                    <div align="center">
+                      @if (!url_file) {
+                      <iconify-icon icon="f7:photo-fill" width="250" height="250"
+                        style="color: #2d67d6" />
+                      }
+                      @if (url_file) {
+                      <img [src]="url_file" alt="Foto de perfil" height="150px" width="180px" />
+                      }
+
+                      <div class="card-block">
+                        <input style="display: none" type="file"
+                          (change)="onFileChangedUserPhoto($event)" #userPhoto />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </form>
@@ -222,13 +203,8 @@
         <button matButton matStepperNext>Next</button>
       </div>
       <div>
-        <button
-          mat-flat-button
-          type="submit"
-          [disabled]="dataForm.invalid"
-          [ngClass]="dataForm.valid ? 'btnSuccess' : 'btnNeutro'"
-          (click)="saveData()"
-        >
+        <button mat-flat-button type="submit" [disabled]="dataForm.invalid"
+          [ngClass]="dataForm.valid ? 'btnSuccess' : 'btnNeutro'" (click)="saveData()">
           Guardar
         </button>
       </div>
@@ -239,12 +215,8 @@
       <ng-template matStepLabel>Fill out your address</ng-template>
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input
-          matInput
-          formControlName="secondCtrl"
-          placeholder="Ex. 1 Main St, New York, NY"
-          required
-        />
+        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
+          required />
       </mat-form-field>
       <div>
         <button matButton matStepperPrevious>Back</button>
@@ -261,3 +233,51 @@
     </div>
   </mat-step>
 </mat-stepper>
+
+<ng-template #dialogCamera>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left" class="titulo">
+      {{ 'menu.usuarios.webcam' | translate }}
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closedModalPhoto()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div style="text-align: center">
+      <div>
+        <!-- ✅ Fix 1: @if en vez de *ngIf + self-closing tag -->
+        @if (showWebcam) {
+        <webcam [height]="150" [width]="180" [trigger]="triggerObservable"
+          (imageCapture)="handleImageUserPhoto($event)" [allowCameraSwitch]="allowCameraSwitch"
+          [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" [imageQuality]="1"
+          (cameraSwitched)="cameraWasSwitched($event)" (initError)="handleInitError($event)" />
+        }
+      </div>
+    </div>
+    <div class="web-block">
+      <button mat-icon-button (click)="triggerSnapshot()" class="icon10">
+        <span class="material-icons"> center_focus_strong </span>
+      </button>
+    </div>
+    <hr />
+    <br />
+    <!-- ✅ Fix 2: @if en vez de *ngIf -->
+    @if (webcamImage) {
+    <div class="snapshot">
+      <h2>{{ 'menu.usuarios.preview' | translate }}</h2>
+      <br />
+      <!-- ✅ Fix 3: agregar alt a la imagen -->
+      <img [src]="webcamImage.imageAsDataUrl" alt="Vista previa de foto" />
+    </div>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="closedModalPhoto()">
+      {{ 'menu.principal.cerrar' | translate }}
+    </button>
+    <!-- <button type="button" class="btn btn-success" (click)="saveData()">
+      {{ 'menu.principal.guardar' | translate }}
+    </button> -->
+  </div>
+</ng-template>

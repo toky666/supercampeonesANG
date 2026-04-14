@@ -15,7 +15,7 @@ export class AutoReloadService implements OnDestroy {
     if (!fechaInicio) return;
 
     const loginTime = new Date(fechaInicio);
-    const targetTime = new Date(loginTime.getTime() + 1 * 60 * 1000);
+    const targetTime = new Date(loginTime.getTime() + 13 * 60 * 1000); // 13 minutos después si el token dura 15 minutos, renovamos a los 13 para evitar expiraciones inesperadas
     const msRestantes = targetTime.getTime() - new Date().getTime();
 
     console.log('loginTime:', loginTime);
